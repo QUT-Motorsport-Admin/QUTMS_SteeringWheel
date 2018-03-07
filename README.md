@@ -3,15 +3,15 @@
 # QUT Motorsport - Steering Wheel
 
 ### What
-What is the system
+A 'dumb' output terminal that acts as a digital dashboard for the car.
 ### Why
-Why is it there, whats its main purpose
+To display information from the Chassis Controller (originating from various car sensors and systems) to the driver.
 ### How
-How dose it work, interact with other systems, whats its responding too, whats its enacting on
+The steering wheel receives information from the Chassis Controller and displays the information relevant to the currently selected mode on a digital display. There will be two cylindrical switches that can be rotated to set the program to different modes allowing for the driver to view different sets of information on the display at will.
 ### Where
-Where dose it sit in the grand scheme of things, whats its heirachy, where is it physicaly in the car
+A digital display in the steering wheel of the car that receives and displays information from other car systems to the driver.
 ### Who
-Who are the people that have worked on it over time
+*Insert anyone who has worked on the software here.*
 
 ## Specific README's
 These will cover any specific features, outlines or documentation that a programmer/designer should know about. Any specifics, or this outside the overview/outline please update an entry in the wiki
