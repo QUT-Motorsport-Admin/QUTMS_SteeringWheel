@@ -3,22 +3,24 @@
 * @author  Zoe Goodward
 * @version V1.0.0
 * @date    28-April-2018
-* @brief   
+* @brief   Functions for creating graphics on the OLED display
 *****************************************************************************/
 
 #include "steeringWheelGraphics.h"
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Graphic Acceleration (Partial or Full Screen)
-//
-//    a: Line Width
-//    b: Column Address of Start
-//    c: Column Address of End
-//    d: Row Address of Start
-//	  e: Row Address of End
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-void Draw_Rectangle(unsigned char Data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char e)
+/*============================================================================
+Function:   draw_rectangle()
+------------------------------------------------------------------------------
+Purpose :   create the outline of a rectangle on the screen
+Input   :   a - line width
+			b - column address of start
+			c - column address of end (total columns divided by 4)
+			d - row address of start
+			e - row address of end
+Returns :   void
+Notes   :
+============================================================================*/
+void draw_rectangle(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char e)
 {
 	unsigned char i,j,k,l;
 
@@ -32,21 +34,21 @@ void Draw_Rectangle(unsigned char Data, unsigned char a, unsigned char b, unsign
 		l=a/4;
 	}
 
-	Set_Column_Address(Shift+b,Shift+c);
-	Set_Row_Address(d,(d+a-1));
-	Set_Write_RAM();
+	set_column_address(Shift+b,Shift+c);
+	set_row_address(d,(d+a-1));
+	set_write_ram();
 	for(i=0;i<(c-b+1);i++)
 	{
 		for(j=0;j<a;j++)
 		{
-			Write_Data(Data);
-			Write_Data(Data);
+			write_data(data);
+			write_data(data);
 		}
 	}
 
-	Set_Column_Address(Shift+(c-l),Shift+c);
-	Set_Row_Address(d+a,e-a);
-	Set_Write_RAM();
+	set_column_address(Shift+(c-l),Shift+c);
+	set_row_address(d+a,e-a);
+	set_write_ram();
 	for(i=0;i<(e-d+1);i++)
 	{
 		for(j=0;j<(l+1);j++)
@@ -56,46 +58,46 @@ void Draw_Rectangle(unsigned char Data, unsigned char a, unsigned char b, unsign
 				switch(k)
 				{
 					case 0:
-					Write_Data(Data);
-					Write_Data(Data);
+					write_data(data);
+					write_data(data);
 					break;
 					case 1:
-					Write_Data(0x00);
-					Write_Data(Data&0x0F);
+					write_data(0x00);
+					write_data(data&0x0F);
 					break;
 					case 2:
-					Write_Data(0x00);
-					Write_Data(Data);
+					write_data(0x00);
+					write_data(data);
 					break;
 					case 3:
-					Write_Data(Data&0x0F);
-					Write_Data(Data);
+					write_data(data&0x0F);
+					write_data(data);
 					break;
 				}
 			}
 			else
 			{
-				Write_Data(Data);
-				Write_Data(Data);
+				write_data(data);
+				write_data(data);
 			}
 		}
 	}
 
-	Set_Column_Address(Shift+b,Shift+c);
-	Set_Row_Address((e-a+1),e);
-	Set_Write_RAM();
+	set_column_address(Shift+b,Shift+c);
+	set_row_address((e-a+1),e);
+	set_write_ram();
 	for(i=0;i<(c-b+1);i++)
 	{
 		for(j=0;j<a;j++)
 		{
-			Write_Data(Data);
-			Write_Data(Data);
+			write_data(data);
+			write_data(data);
 		}
 	}
 
-	Set_Column_Address(Shift+b,Shift+(b+l));
-	Set_Row_Address(d+a,e-a);
-	Set_Write_RAM();
+	set_column_address(Shift+b,Shift+(b+l));
+	set_row_address(d+a,e-a);
+	set_write_ram();
 	for(i=0;i<(e-d+1);i++)
 	{
 		for(j=0;j<(l+1);j++)
@@ -105,169 +107,175 @@ void Draw_Rectangle(unsigned char Data, unsigned char a, unsigned char b, unsign
 				switch(k)
 				{
 					case 0:
-					Write_Data(Data);
-					Write_Data(Data);
+					write_data(data);
+					write_data(data);
 					break;
 					case 1:
-					Write_Data(Data&0xF0);
-					Write_Data(0x00);
+					write_data(data&0xF0);
+					write_data(0x00);
 					break;
 					case 2:
-					Write_Data(Data);
-					Write_Data(0x00);
+					write_data(data);
+					write_data(0x00);
 					break;
 					case 3:
-					Write_Data(Data);
-					Write_Data(Data&0xF0);
+					write_data(data);
+					write_data(data&0xF0);
 					break;
 				}
 			}
 			else
 			{
-				Write_Data(Data);
-				Write_Data(Data);
+				write_data(data);
+				write_data(data);
 			}
 		}
 	}
 }
 
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Regular Pattern (Full Screen)
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void fill_ram(unsigned char Data)
+/*============================================================================
+Function:   fill_ram()
+------------------------------------------------------------------------------
+Purpose :   fill the screen with the value of the variable: data
+Input   :   unsigned char data - use macros CLEAR_SCREEN or FILL_SCREEN
+Returns :   none
+Notes   :
+============================================================================*/
+void fill_ram(unsigned char data)
 {
 	unsigned char i,j;
 
-	Set_Column_Address(0x00,0x77);
-	Set_Row_Address(0x00,0x7F);
-	Set_Write_RAM();
+	set_column_address(0x00,0x77);
+	set_row_address(0x00,0x7F);
+	set_write_ram();
 
-	for(i=0;i<128;i++)
+	for(i=0;i<128;i++) // i < SCREEN_WIDTH / 2
 	{
 		for(j=0;j<120;j++)
 		{
-			Write_Data(Data);
-			//Write_Data(Data);
+			write_data(data);
+			//write_data(data);
 		}
 	}
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Regular Pattern (Partial or Full Screen)
-//
-//    a: Column Address of Start
-//    b: Column Address of End (Total Columns Devided by 4)
-//    c: Row Address of Start
-//    d: Row Address of End
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Fill_Block(unsigned char Data, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
+/*============================================================================
+Function:   fill_block()
+------------------------------------------------------------------------------
+Purpose :   create a filled in rectangle on the screen
+Input   :   data - 
+			a - column address of start
+			b - column address of end (total columns divided by 4)
+			c - row address of start
+			d - row address of end
+Returns :   void
+Notes   :
+============================================================================*/
+void fill_block(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
 {
 	unsigned char i,j;
 	
-	Set_Column_Address(Shift+a,Shift+b);
-	Set_Row_Address(c,d);
-	Set_Write_RAM();
+	set_column_address(Shift+a,Shift+b);
+	set_row_address(c,d);
+	set_write_ram();
 
 	for(i=0;i<(d-c+1);i++)
 	{
 		for(j=0;j<(b-a+1);j++)
 		{
-			Write_Data(Data);
-			Write_Data(Data);
+			write_data(data);
+			write_data(data);
 		}
 	}
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Checkboard (Full Screen)
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Checkerboard()
+/*============================================================================
+Function:   checkerboard()
+------------------------------------------------------------------------------
+Purpose :   display a checkerboard pattern across the screen
+Input   :   none
+Returns :   void
+Notes   :
+============================================================================*/
+void checkerboard()
 {
 	unsigned char i,j;
 	
-	Set_Column_Address(0x00,0x77);
-	Set_Row_Address(0x00,0x7F);
-	Set_Write_RAM();
+	set_column_address(0x00,0x77);
+	set_row_address(0x00,0x7F);
+	set_write_ram();
 
 	for(i=0;i<64;i++)
 	{
 		for(j=0;j<120;j++)
 		{
-			Write_Data(0xF0);
-			Write_Data(0xF0);
+			write_data(0xF0);
+			write_data(0xF0);
 		}
 		for(j=0;j<120;j++)
 		{
-			Write_Data(0x0F);
-			Write_Data(0x0F);
+			write_data(0x0F);
+			write_data(0x0F);
 		}
 	}
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Gray Scale Bar (Full Screen)
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Grayscale()
+/*============================================================================
+Function:   grayscale()
+------------------------------------------------------------------------------
+Purpose :   display a gray scale bar across the screen
+Input   :   none
+Returns :   void
+Notes   :
+============================================================================*/
+void grayscale()
 {
 	// Level 16 => Column 1~16
-	Fill_Block(0xFF,0x00,0x03,0x00,Max_Row);
-
+	fill_block(0xFF,0x00,0x03,0x00,Max_Row);
 	// Level 15 => Column 17~32
-	Fill_Block(0xEE,0x04,0x07,0x00,Max_Row);
-
+	fill_block(0xEE,0x04,0x07,0x00,Max_Row);
 	// Level 14 => Column 33~48
-	Fill_Block(0xDD,0x08,0x0B,0x00,Max_Row);
-
+	fill_block(0xDD,0x08,0x0B,0x00,Max_Row);
 	// Level 13 => Column 49~64
-	Fill_Block(0xCC,0x0C,0x0F,0x00,Max_Row);
-
+	fill_block(0xCC,0x0C,0x0F,0x00,Max_Row);
 	// Level 12 => Column 65~80
-	Fill_Block(0xBB,0x10,0x13,0x00,Max_Row);
-
+	fill_block(0xBB,0x10,0x13,0x00,Max_Row);
 	// Level 11 => Column 81~96
-	Fill_Block(0xAA,0x14,0x17,0x00,Max_Row);
-
+	fill_block(0xAA,0x14,0x17,0x00,Max_Row);
 	// Level 10 => Column 97~112
-	Fill_Block(0x99,0x18,0x1B,0x00,Max_Row);
-
+	fill_block(0x99,0x18,0x1B,0x00,Max_Row);
 	// Level 9 => Column 113~128
-	Fill_Block(0x88,0x1C,0x1F,0x00,Max_Row);
-
+	fill_block(0x88,0x1C,0x1F,0x00,Max_Row);
 	// Level 8 => Column 129~144
-	Fill_Block(0x77,0x20,0x23,0x00,Max_Row);
-
+	fill_block(0x77,0x20,0x23,0x00,Max_Row);
 	// Level 7 => Column 145~160
-	Fill_Block(0x66,0x24,0x27,0x00,Max_Row);
-
+	fill_block(0x66,0x24,0x27,0x00,Max_Row);
 	// Level 6 => Column 161~176
-	Fill_Block(0x55,0x28,0x2B,0x00,Max_Row);
-
+	fill_block(0x55,0x28,0x2B,0x00,Max_Row);
 	// Level 5 => Column 177~192
-	Fill_Block(0x44,0x2C,0x2F,0x00,Max_Row);
-
+	fill_block(0x44,0x2C,0x2F,0x00,Max_Row);
 	// Level 4 => Column 193~208
-	Fill_Block(0x33,0x30,0x33,0x00,Max_Row);
-
+	fill_block(0x33,0x30,0x33,0x00,Max_Row);
 	// Level 3 => Column 209~224
-	Fill_Block(0x22,0x34,0x37,0x00,Max_Row);
-
+	fill_block(0x22,0x34,0x37,0x00,Max_Row);
 	// Level 2 => Column 225~240
-	Fill_Block(0x11,0x38,0x3B,0x00,Max_Row);
-
+	fill_block(0x11,0x38,0x3B,0x00,Max_Row);
 	// Level 1 => Column 241~256
-	Fill_Block(0x00,0x3C,Max_Column,0x00,Max_Row);
+	fill_block(0x00,0x3C,Max_Column,0x00,Max_Row);
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Character (5x7)
-//
-//    a: Database
-//    b: Ascii
-//    c: Start X Address
-//    d: Start Y Address
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Show_Font57(unsigned char a, unsigned char b, unsigned char c, unsigned char d)
+/*============================================================================
+Function:   show_font_5x7()
+------------------------------------------------------------------------------
+Purpose :   displays a 5x7 character
+Input   :   a - database
+			b - Ascii
+			c - start x address
+			d - start y address
+Returns :   void
+Notes   :
+============================================================================*/
+void show_font_5x7(unsigned char a, unsigned char b, unsigned char c, unsigned char d)
 {
 	if(b == ' ')
 	{
@@ -292,7 +300,7 @@ void Show_Font57(unsigned char a, unsigned char b, unsigned char c, unsigned cha
 		//break;
 	}
 
-	Set_Remap_Format(0x15);
+	set_remap_format(0x15);
 	for(i=0;i<=1;i++)
 	{
 		MSB_1= *Src_Pointer;
@@ -312,166 +320,181 @@ void Show_Font57(unsigned char a, unsigned char b, unsigned char c, unsigned cha
 			LSB_2=*Src_Pointer;
 			Src_Pointer++;
 		}
-		Set_Column_Address(Shift+c,Shift+c);
-		Set_Row_Address(d,d+7);
-		Set_Write_RAM();
+		set_column_address(Shift+c,Shift+c);
+		set_row_address(d,d+7);
+		set_write_ram();
 		
 		Font=((MSB_1&0x01)<<4)|(LSB_1&0x01);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x01)<<4)|(LSB_2&0x01);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x02)<<3)|((LSB_1&0x02)>>1);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x02)<<3)|((LSB_2&0x02)>>1);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x04)<<2)|((LSB_1&0x04)>>2);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x04)<<2)|((LSB_2&0x04)>>2);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x08)<<1)|((LSB_1&0x08)>>3);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x08)<<1)|((LSB_2&0x08)>>3);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x10)<<3)|((LSB_1&0x10)>>1);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x10)<<3)|((LSB_2&0x10)>>1);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 
 		Font=((MSB_1&0x20)<<2)|((LSB_1&0x20)>>2);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x20)<<2)|((LSB_2&0x20)>>2);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 
 		Font=((MSB_1&0x40)<<1)|((LSB_1&0x40)>>3);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x40)<<1)|((LSB_2&0x40)>>3);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 
 		Font=(MSB_1&0x80)|((LSB_1&0x80)>>4);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 		Font=(MSB_2&0x80)|((LSB_2&0x80)>>4);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
-		Write_Data(Font);
+		write_data(Font);
 		
-		//Set_Row_Address(derp,derp+7);
-		//Set_Write_RAM();
+		//set_row_address(derp,derp+7);
+		//set_write_ram();
 
 		/*
 
 		Font=((MSB_1&0x01)<<4)|(LSB_1&0x01);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x01)<<4)|(LSB_2&0x01);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x02)<<3)|((LSB_1&0x02)>>1);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x02)<<3)|((LSB_2&0x02)>>1);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x04)<<2)|((LSB_1&0x04)>>2);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x04)<<2)|((LSB_2&0x04)>>2);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x08)<<1)|((LSB_1&0x08)>>3);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x08)<<1)|((LSB_2&0x08)>>3);
 		Font=Font|(Font<<1)|(Font<<2)|(Font<<3)|(Font<<4)|(Font<<5);
-		Write_Data(Font);
+		write_data(Font);
 		
 		Font=((MSB_1&0x10)<<3)|((LSB_1&0x10)>>1);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x10)<<3)|((LSB_2&0x10)>>1);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 
 		Font=((MSB_1&0x20)<<2)|((LSB_1&0x20)>>2);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x20)<<2)|((LSB_2&0x20)>>2);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 
 		Font=((MSB_1&0x40)<<1)|((LSB_1&0x40)>>3);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=((MSB_2&0x40)<<1)|((LSB_2&0x40)>>3);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 
 		Font=(MSB_1&0x80)|((LSB_1&0x80)>>4);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 		Font=(MSB_2&0x80)|((LSB_2&0x80)>>4);
 		Font=Font|(Font>>1)|(Font>>2)|(Font>>3)|(Font>>4)|(Font>>5);
-		Write_Data(Font);
+		write_data(Font);
 		
 		*/
 		
 		c++;
 	}
-	Set_Remap_Format(0x14);
+	set_remap_format(0x14);
 	
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Character
-//
-//    a: Database
-//    b: Start X Address
-//    c: Start Y Address
-//    * Must write "0" in the end...
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Show_Char(unsigned char a, unsigned char Data, unsigned char b, unsigned char c)
+/*============================================================================
+Function:   show_char()
+------------------------------------------------------------------------------
+Purpose :   displays character on screen
+Input   :   a - database
+			b - start x address
+			c - start y address
+Returns :   void
+Notes   :	* Must write "0" in the end...
+============================================================================*/
+void show_char(unsigned char a, unsigned char data, unsigned char b, unsigned char c)
 {
 	//unsigned char *Src_Pointer;
 
-	//Src_Pointer=Data_Pointer;
-	Show_Font57(1,96,b,c);			// No-Break Space
+	//Src_Pointer=data_pointer;
+	show_font_5x7(1,96,b,c);			// No-Break Space
 	//   Must be written first before the string start...
 
-	Show_Font57(a,Data,b,c);
+	show_font_5x7(a,data,b,c);
 	//while(1)
 	//{
-		//Show_Font57(a,*Src_Pointer,b,c);
+		//show_font_5x7(a,*Src_Pointer,b,c);
 		//Src_Pointer++;
 		//b+=2;
 		//if(*Src_Pointer == 0) break;
 	//}
 }
 
-void Show_Huge_Char(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
+/*============================================================================
+Function:   show_huge_char()
+------------------------------------------------------------------------------
+Purpose :   displays character on screen
+Input   :   data - 
+			a - column address of start
+			b - column address of end (total columns divided by 4)
+			c - row address of start
+			d - row address of end
+
+Returns :   void
+Notes   :	* Must write "0" in the end...
+============================================================================*/
+void show_huge_char(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
 {
-	Set_Column_Address(Shift+a,Shift+b);
-	Set_Row_Address(c,c+38);
-	Set_Write_RAM();
+	set_column_address(Shift+a,Shift+b);
+	set_row_address(c,c+38);
+	set_write_ram();
 	int counter = 0;
 	int i = 0;
 	
@@ -568,18 +591,18 @@ void Show_Huge_Char(unsigned char data, unsigned char a, unsigned char b, unsign
 			}
 			
 			//Now we have a temporary 8 bit number with 2 pixels embedded in it we can send it to the screen
-			Write_Data(tempNibbles);
+			write_data(tempNibbles);
 		}
-		Set_Column_Address(Shift+a,Shift+b);
-		Set_Row_Address(c+i+1,c+38);
-		Set_Write_RAM();
+		set_column_address(Shift+a,Shift+b);
+		set_row_address(c+i+1,c+38);
+		set_write_ram();
 	}
 }
-void Show_Bigger_Char(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
+void show_bigger_char(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
 {
-	Set_Column_Address(Shift+a,Shift+b);
-	Set_Row_Address(c,c+25);
-	Set_Write_RAM();
+	set_column_address(Shift+a,Shift+b);
+	set_row_address(c,c+25);
+	set_write_ram();
 	int counter = 0;
 	int i = 0;
 	
@@ -659,19 +682,19 @@ void Show_Bigger_Char(unsigned char data, unsigned char a, unsigned char b, unsi
 			}
 			
 			//Now we have a temporary 8 bit number with 2 pixels embedded in it we can send it to the screen
-			Write_Data(tempNibbles);
+			write_data(tempNibbles);
 		}
-		Set_Column_Address(Shift+a,Shift+b);
-		Set_Row_Address(c+i+1,c+30);
-		Set_Write_RAM();
+		set_column_address(Shift+a,Shift+b);
+		set_row_address(c+i+1,c+30);
+		set_write_ram();
 	}
 }
 
-void Show_Big_Char(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
+void show_big_char(unsigned char data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
 {
-	Set_Column_Address(Shift+a,Shift+b);
-	Set_Row_Address(c,c+17);
-	Set_Write_RAM();
+	set_column_address(Shift+a,Shift+b);
+	set_row_address(c,c+17);
+	set_write_ram();
 	int counter = 0;
 	int i = 0;
 	
@@ -741,107 +764,119 @@ void Show_Big_Char(unsigned char data, unsigned char a, unsigned char b, unsigne
 			}
 			
 			//Now we have a temporary 8 bit number with 2 pixels embedded in it we can send it to the screen
-			Write_Data(tempNibbles);
+			write_data(tempNibbles);
 		}
-		Set_Column_Address(Shift+a,Shift+b);
-		Set_Row_Address(c+i+1,c+17);
-		Set_Write_RAM();
+		set_column_address(Shift+a,Shift+b);
+		set_row_address(c+i+1,c+17);
+		set_write_ram();
 	}
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show String
-//
-//    a: Database
-//    b: Start X Address
-//    c: Start Y Address
-//    * Must write "0" in the end...
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Show_String(unsigned char a, unsigned char *Data_Pointer, unsigned char b, unsigned char c)
+/*============================================================================
+Function:   show_string()
+------------------------------------------------------------------------------
+Purpose :   displays a string on screen
+Input   :   a - database
+			b - start x address
+			c - start y address
+Returns :   void
+Notes   :	* Must write "0" in the end...
+============================================================================*/
+void show_string(unsigned char a, unsigned char *data_pointer, unsigned char b, unsigned char c)
 {
 	unsigned char *Src_Pointer;
 
-	Src_Pointer=Data_Pointer;
-	Show_Font57(1,96,b,c);			// No-Break Space
+	Src_Pointer=data_pointer;
+	show_font_5x7(1,96,b,c);			// No-Break Space
 	//   Must be written first before the string start...
 
 	while(1)
 	{
-		Show_Font57(a,*Src_Pointer,b,c);
+		show_font_5x7(a,*Src_Pointer,b,c);
 		Src_Pointer++;
 		b+=2;
 		if(*Src_Pointer == 0) break;
 	}
 }
 
-void Show_Huge_String(unsigned char *Data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned int length,  unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
+void show_huge_string(unsigned char *data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned int length,  unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
 {
 	for(int i = 0; i < length; i++)
 	{
-		Show_Huge_Char(*Data,a,b,c,d, LwrNibbleBrightness, UppNibbleBrightness);
-		Data++;
+		show_huge_char(*data,a,b,c,d, LwrNibbleBrightness, UppNibbleBrightness);
+		data++;
 		a+=7;
 		b+=7;
 	}
 }
 
-void Show_Bigger_String(unsigned char *Data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned int length,  unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
+void show_bigger_string(unsigned char *data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned int length,  unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
 {
 	for(int i = 0; i < length; i++)
 	{
-		Show_Bigger_Char(*Data,a,b,c,d, LwrNibbleBrightness, UppNibbleBrightness);
-		Data++;
+		show_bigger_char(*data,a,b,c,d, LwrNibbleBrightness, UppNibbleBrightness);
+		data++;
 		a+=4;
 		b+=4;
 	}
 }
 
-void Show_Big_String(unsigned char *Data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned int length, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
+void show_big_string(unsigned char *data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned int length, unsigned char LwrNibbleBrightness, unsigned char UppNibbleBrightness)
 {
 	for(int i = 0; i < length; i++)
 	{
-		Show_Big_Char(*Data,a,b,c,d, LwrNibbleBrightness, UppNibbleBrightness);
-		Data++;
+		show_big_char(*data,a,b,c,d, LwrNibbleBrightness, UppNibbleBrightness);
+		data++;
 		a+=3;
 		b+=3;
 	}
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Pattern (Partial or Full Screen)
-//
-//    a: Column Address of Start
-//    b: Column Address of End (Total Columns Devided by 4)
-//    c: Row Address of Start
-//    d: Row Address of End
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Show_Pattern(unsigned char *Data_Pointer, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
+/*============================================================================
+Function:   show_pattern()
+------------------------------------------------------------------------------
+Purpose :   displays a 
+Input   :   *data_pointer - 
+			a - column address of start
+			b - column address of end (total columns divided by 4)
+			c - row address of start
+			d - row address of end
+Returns :   void
+Notes   :	* Must write "0" in the end...
+============================================================================*/
+void show_pattern(unsigned char *data_pointer, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
 {
-	unsigned char *Src_Pointer;
+	unsigned char *src_pointer;
 	unsigned char i,j;
 	
-	Src_Pointer=Data_Pointer;
-	Set_Column_Address(Shift+a,Shift+b);
-	Set_Row_Address(c,d);
-	Set_Write_RAM();
+	src_pointer=data_pointer;
+	set_column_address(Shift+a,Shift+b);
+	set_row_address(c,d);
+	set_write_ram();
 
 	for(i=0;i<(d-c+1);i++)
 	{
 		for(j=0;j<(b-a+1);j++)
 		{
-			Write_Data(*Src_Pointer);
-			Src_Pointer++;
-			Write_Data(*Src_Pointer);
-			Src_Pointer++;
+			write_data(*src_pointer);
+			src_pointer++;
+			write_data(*src_pointer);
+			src_pointer++;
 		}
 	}
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  DATA PROCESSING
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Data_processing(unsigned char temp)  //turns 1byte B/W data to 4 bye gray data
-{unsigned char temp1,temp2,temp3,temp4,temp5,temp6,temp7,temp8;
+/*============================================================================
+Function:   data_processing()
+------------------------------------------------------------------------------
+Purpose :   turns 1 byte of B/W data into 4 byte gray data
+Input   :   unsigned char temp - 
+Returns :   return
+Notes   :
+============================================================================*/
+void data_processing(unsigned char temp)
+{
+	unsigned char temp1,temp2,temp3,temp4,temp5,temp6,temp7,temp8;
 	unsigned char h11,h12,h13,h14,h15,h16,h17,h18,d1,d2,d3,d4;
 
 	temp1=temp&0x80;
@@ -865,53 +900,59 @@ void Data_processing(unsigned char temp)  //turns 1byte B/W data to 4 bye gray d
 	d3=h15|h16;
 	d4=h17|h18;
 
-	Write_Data(d1);
-	Write_Data(d2);
-	Write_Data(d3);
-	Write_Data(d4);
+	write_data(d1);
+	write_data(d2);
+	write_data(d3);
+	write_data(d4);
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  DISPLAY PICTURE
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Display_Picture(unsigned char pic[])
+/*============================================================================
+Function:   display_picture()
+------------------------------------------------------------------------------
+Purpose :   displays a bitmap image on the OLED screen
+Input   :   unsigned char pic[] - an array of hexidecimal values
+Returns :   return
+Notes   :
+============================================================================*/
+void display_picture(unsigned char pic[])
 {
 	unsigned char i,j;
-	Set_Column_Address(Shift+0x00,Shift+0x77);
-	Set_Row_Address(0x00,0x7F);
-	Set_Write_RAM();
+	set_column_address(Shift+0x00,Shift+0x77);
+	set_row_address(0x00,0x7F);
+	set_write_ram();
 
 	for(i=0;i<64;i++)
 	{
 		for(j=0;j<60;j++)
 		{
-			Data_processing(pgm_read_byte(&pic[i*32+j]));
+			data_processing(pgm_read_byte(&pic[i*32+j]));
 		}
 	}
 	return;
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Vertical Scrolling (Full Screen)
-//
-//    a: Scrolling Direction
-//       "0x00" (Upward)
-//       "0x01" (Downward)
-//    b: Set Numbers of Row Scroll per Step
-//    c: Set Time Interval between Each Scroll Step
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Vertical_Scroll(unsigned char a, unsigned char b, unsigned char c)
+/*============================================================================
+Function:   vertical_scroll()
+------------------------------------------------------------------------------
+Purpose :   creates vertical scrolling effect
+Input   :   a - scrolling direction (use macros UPWARD or DOWNWARD)
+			b - set number of row scroll per step
+			c - set time interval between each scroll step
+Returns :   void
+Notes   :
+============================================================================*/
+void vertical_scroll(unsigned char a, unsigned char b, unsigned char c)
 {
 	unsigned char i,j;
 
-	Set_Partial_Display(0x00,0x00,Max_Row);
+	set_partial_display(0x00,0x00,Max_Row);
 
 	switch(a)
 	{
 		case 0:
 		for(i=0;i<(Max_Row+1);i+=b)
 		{
-			Set_Display_Offset(i+1);
+			set_display_offset(i+1);
 			for(j=0;j<c;j++)
 			{
 				uDelay(1600);
@@ -921,7 +962,7 @@ void Vertical_Scroll(unsigned char a, unsigned char b, unsigned char c)
 		case 1:
 		for(i=0;i<(Max_Row+1);i+=b)
 		{
-			Set_Display_Offset(Max_Row-i);
+			set_display_offset(Max_Row-i);
 			for(j=0;j<c;j++)
 			{
 				uDelay(1600);
@@ -929,39 +970,38 @@ void Vertical_Scroll(unsigned char a, unsigned char b, unsigned char c)
 		}
 		break;
 	}
-	Set_Partial_Display(0x01,0x00,0x00);
+	set_partial_display(0x01,0x00,0x00);
 }
 
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Vertical Fade Scrolling (Full Screen)
-//
-//    a: Scrolling Direction
-//       "0x00" (Upward - In)
-//       "0x01" (Downward - In)
-//       "0x02" (Upward - Out)
-//       "0x03" (Downward - Out)
-//    b: Set Numbers of Row Scroll per Step
-//    c: Set Time Interval between Each Scroll Step
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Fade_Scroll(unsigned char a, unsigned char b, unsigned char c)
+/*============================================================================
+Function:   fade_scroll()
+------------------------------------------------------------------------------
+Purpose :   creates vertical fade scrolling effect
+Input   :   a - scrolling direction (use macros UPWARD or DOWNWARD (for inward
+			direction) or UPWARD_OUT or _DOWNWARD_OUT)
+			b - set number of row scroll per step
+			c - set time interval between each scroll step
+Returns :   void
+Notes   :
+============================================================================*/
+void fade_scroll(unsigned char a, unsigned char b, unsigned char c)
 {
 	unsigned char i,j;
 
-	Set_Partial_Display(0x00,0x00,Max_Row);
+	set_partial_display(0x00,0x00,Max_Row);
 
 	switch(a)
 	{
 		case 0:
 		for(i=(Max_Row+1);i<128;i+=b)
 		{
-			Set_Start_Line(i);
+			set_start_line(i);
 			for(j=0;j<c;j++)
 			{
 				uDelay(200);
 			}
 		}
-		Set_Start_Line(0x00);
+		set_start_line(0x00);
 		for(j=0;j<c;j++)
 		{
 			uDelay(200);
@@ -970,7 +1010,7 @@ void Fade_Scroll(unsigned char a, unsigned char b, unsigned char c)
 		case 1:
 		for(i=0;i<(Max_Row+1);i+=b)
 		{
-			Set_Start_Line(Max_Row-i);
+			set_start_line(Max_Row-i);
 			for(j=0;j<c;j++)
 			{
 				uDelay(200);
@@ -980,7 +1020,7 @@ void Fade_Scroll(unsigned char a, unsigned char b, unsigned char c)
 		case 2:
 		for(i=0;i<(Max_Row+1);i+=b)
 		{
-			Set_Start_Line(i+1);
+			set_start_line(i+1);
 			for(j=0;j<c;j++)
 			{
 				uDelay(200);
@@ -990,7 +1030,7 @@ void Fade_Scroll(unsigned char a, unsigned char b, unsigned char c)
 		case 3:
 		for(i=127;i>Max_Row;i-=b)
 		{
-			Set_Start_Line(i);
+			set_start_line(i);
 			for(j=0;j<c;j++)
 			{
 				uDelay(200);
@@ -998,116 +1038,92 @@ void Fade_Scroll(unsigned char a, unsigned char b, unsigned char c)
 		}
 		break;
 	}
-	Set_Partial_Display(0x01,0x00,0x00);
+	set_partial_display(0x01,0x00,0x00);
 }
 
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Fade In (Full Screen)
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Fade_In()
+/*============================================================================
+Function:   fade_in()
+------------------------------------------------------------------------------
+Purpose :   creates a fade in effect (full screen)
+Input   :   none
+Returns :   void
+Notes   :
+============================================================================*/
+void fade_in()
 {
 	unsigned char i;
 
-	Set_Display_On_Off(0x01);
+	set_display_on_off(0x01);
 	for(i=0;i<(Brightness+1);i++)
 	{
-		Set_Master_Current(i);
+		set_master_current(i);
 		uDelay(200);
 		uDelay(200);
 		uDelay(200);
 	}
 }
 
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Fade Out (Full Screen)
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Fade_Out()
+/*============================================================================
+Function:   fade_out()
+------------------------------------------------------------------------------
+Purpose :   creates a fade out effect (full screen)
+Input   :   none
+Returns :   void
+Notes   :
+============================================================================*/
+void fade_out()
 {
 	unsigned char i;
 
 	for(i=(Brightness+1);i>0;i--)
 	{
-		Set_Master_Current(i-1);
+		set_master_current(i-1);
 		uDelay(200);
 		uDelay(200);
 		uDelay(200);
 	}
-	Set_Display_On_Off(0x00);
+	set_display_on_off(0x00);
 }
 
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Sleep Mode
-//
-//    "0x01" Enter Sleep Mode
-//    "0x00" Exit Sleep Mode
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Sleep(unsigned char a)
+/*============================================================================
+Function:   set_gray_scale_table()
+------------------------------------------------------------------------------
+Purpose :   Set gray scale table
+Input   :   none
+Returns :   void
+Notes   :
+============================================================================*/
+void set_gray_scale_table()
 {
-	switch(a)
-	{
-		case 0:
-		Set_Display_On_Off(0x00);
-		Set_Display_Mode(0x01);
-		break;
-		case 1:
-		Set_Display_Mode(0x02);
-		Set_Display_On_Off(0x01);
-		break;
-	}
+	write_command(0xB8);			// Set Gray Scale Table
+	write_data(0x0C);			//   Gray Scale Level 1
+	write_data(0x18);			//   Gray Scale Level 2
+	write_data(0x24);			//   Gray Scale Level 3
+	write_data(0x30);			//   Gray Scale Level 4
+	write_data(0x3C);			//   Gray Scale Level 5
+	write_data(0x48);			//   Gray Scale Level 6
+	write_data(0x54);			//   Gray Scale Level 7
+	write_data(0x60);			//   Gray Scale Level 8
+	write_data(0x6C);			//   Gray Scale Level 9
+	write_data(0x78);			//   Gray Scale Level 10
+	write_data(0x84);			//   Gray Scale Level 11
+	write_data(0x90);			//   Gray Scale Level 12
+	write_data(0x9C);			//   Gray Scale Level 13
+	write_data(0xA8);			//   Gray Scale Level 14
+	write_data(0xB4);			//   Gray Scale Level 15
+
+	write_command(0x00);			// Enable Gray Scale Table
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Connection Test
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Test()
+/*============================================================================
+Function:   set_linear_gray_scale_table()
+------------------------------------------------------------------------------
+Purpose :   Set linear gray scale table
+Input   :   none
+Returns :   void
+Notes   :
+============================================================================*/
+void set_linear_gray_scale_table()
 {
-	unsigned char i;
-
-	RESET_low;
-	Delay(300);
-	RESET_high;
-
-	Set_Display_Mode(0x01);			// Entire Display On Mode (0x00/0x01/0x02/0x03)
-
-	while(1)
-	{
-		Set_Display_On_Off(0x01);	// Display On (0x00/0x01)
-		Delay(32);
-		Set_Display_On_Off(0x00);	// Display Off (0x00/0x01)
-		Delay(32);
-	}
-}
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Gray Scale Table Setting (Full Screen)
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Set_Gray_Scale_Table()
-{
-	Write_Command(0xB8);			// Set Gray Scale Table
-	Write_Data(0x0C);			//   Gray Scale Level 1
-	Write_Data(0x18);			//   Gray Scale Level 2
-	Write_Data(0x24);			//   Gray Scale Level 3
-	Write_Data(0x30);			//   Gray Scale Level 4
-	Write_Data(0x3C);			//   Gray Scale Level 5
-	Write_Data(0x48);			//   Gray Scale Level 6
-	Write_Data(0x54);			//   Gray Scale Level 7
-	Write_Data(0x60);			//   Gray Scale Level 8
-	Write_Data(0x6C);			//   Gray Scale Level 9
-	Write_Data(0x78);			//   Gray Scale Level 10
-	Write_Data(0x84);			//   Gray Scale Level 11
-	Write_Data(0x90);			//   Gray Scale Level 12
-	Write_Data(0x9C);			//   Gray Scale Level 13
-	Write_Data(0xA8);			//   Gray Scale Level 14
-	Write_Data(0xB4);			//   Gray Scale Level 15
-
-	Write_Command(0x00);			// Enable Gray Scale Table
-}
-
-
-void Set_Linear_Gray_Scale_Table()
-{
-	Write_Command(0xB9);			// Set Default Linear Gray Scale Table
+	write_command(0xB9);			// Set Default Linear Gray Scale Table
 }

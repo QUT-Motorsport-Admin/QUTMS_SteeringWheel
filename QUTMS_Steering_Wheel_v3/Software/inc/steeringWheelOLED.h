@@ -21,6 +21,11 @@
 #define OLED_X     256
 #define OLED_Y     64
 
+
+#define SLEEP_MODE_ON 0x01
+#define SLEEP_MODE_OFF 0x00
+
+
  // LCD Command and Data
 
  // Display Modes
@@ -66,18 +71,51 @@ void Write_Data(unsigned char Data);
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Instruction Setting
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Set_Column_Address(unsigned char a, unsigned char b);
+void set_column_address(unsigned char a, unsigned char b);
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Graphic Acceleration (Partial or Full Screen)
-//
-//    a: Line Width
-//    b: Column Address of Start
-//    c: Column Address of End
-//    d: Row Address of Start
-//    e: Row Address of End
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Draw_Rectangle(unsigned char Data, unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char e);
+void set_row_address(unsigned char a, unsigned char b);
+
+void set_write_ram();
+
+void set_read_ram();
+
+void set_remap_format(unsigned char d);
+
+void set_start_line(unsigned char d);
+
+void set_display_offset(unsigned char d);
+
+void set_display_mode(unsigned char d);
+
+void set_partial_display(unsigned char a, unsigned char b, unsigned char c);
+
+void set_function_selection(unsigned char d);
+
+void set_display_on_off(unsigned char d);
+
+void set_phase_length(unsigned char d);
+
+void set_display_clock(unsigned char d);
+
+void set_display_enhancement_a(unsigned char a, unsigned char b);
+
+void set_gpio(unsigned char d);
+
+void set_precharge_period(unsigned char d);
+
+void set_precharge_voltage(unsigned char d);
+
+void set_vcomh(unsigned char d);
+
+void set_contrast_current(unsigned char d);
+
+void set_master_current(unsigned char d);
+
+void set_multiplex_ratio(unsigned char d);
+
+void set_display_enhancement_b(unsigned char d);
+
+void set_command_lock(unsigned char d);
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Show Regular Pattern (Full Screen)
@@ -87,7 +125,7 @@ void fill_ram(unsigned char Data);
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  DATA PROCESSING
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Data_processing(unsigned char temp);
+void data_processing(unsigned char temp);
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Sleep Mode
@@ -95,11 +133,11 @@ void Data_processing(unsigned char temp);
 //    "0x01" Enter Sleep Mode
 //    "0x00" Exit Sleep Mode
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Sleep(unsigned char a);
+void sleep(unsigned char a);
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Connection Test
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-void Test();
+void test();
 
 #endif /* STEERINGWHEELOLED_H_ */

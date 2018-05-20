@@ -13,7 +13,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <avr/interrupt.h>
-#include <string.h>
 #include <math.h>
 
 //Internal libraries
@@ -22,6 +21,8 @@
 #include "steeringWheelGraphics.h"
 #include "steeringWheelBitOpr.h"
 #include "steeringWheelBitmaps.h"
+#include "steeringWheelFunctions.h"
+#include "main.h"
 
 uint16_t ThrottlePercentageData = 0;
 uint32_t RPMData = 0;
@@ -72,47 +73,20 @@ ISR(CAN_INT_vect)
 // THIRD UNSIGNED INT: GEARBOX TEMP
 // FOURTH UNSIGNED INT: VOLTAGE
 
-
-void initialise() 
-{
-	can_init();
-	can_rx_init(5,8,0x400000, 0x400000);
-	adc_init();
-	spi_init(); // Initialise SPI (OLED screen communication)
-	oled_init();
-	sei(); // Enable interrupts
-}
-
-void loading_screen() 
-{
-	fill_ram(CLEAR_SCREEN);
-	Display_Picture(motorsport);
-	Delay(3000);
-	fill_ram(CLEAR_SCREEN);
-}
-
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Main Program
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-int main()
+int main(void)
 {
 	DDRB = 0b11100011;	//b7 - SCK; b1 - MOSI
 	//DDRC &= ~(1 << PINC0);
 	DDRD = 0b00001001;	//b3 - SS pin
 	SPI_clock_high;
 	
-	initialise();
-	loading_screen();
-	
-	/*
-	Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x00,0x10);
-	Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x11,0x20);
-	Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x21,0x30);
-	Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x31,0x3F);
-	*/
+	steering_wheel_init();
 	
 	// Globals
-	// If using Show_String, append 0x00 as an extra character on end of the string, eg: unsigned char Acceleration[]= {'A','C','C','E','L','E','R','A','T','I','O','N',0x00};
+	// If using show_string, append 0x00 as an extra character on end of the string, eg: unsigned char Acceleration[]= {'A','C','C','E','L','E','R','A','T','I','O','N',0x00};
 	unsigned char Acceleration[]= {'A','C','C','E','L','E','R','A','T','I','O','N'};
 	unsigned char SkidPad[]= {'S','K','I','D','P','A','D'};
 	unsigned char AutoCross[]= {'A','U','T','O','C','R','O','S','S'};
@@ -151,8 +125,6 @@ int main()
 		
 	while(1)
 	{	
-		#define LEFT_DIAL 3
-		#define RIGHT_DIAL 2
 		read_dials();
 		LeftDialADC = adc_read(LEFT_DIAL);
 		LeftDialADCScaled = (int)(LeftDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
@@ -174,10 +146,10 @@ int main()
 			{
 				ADC_Change = 0;
 				if(LeftDialADCScaled > LeftDialADCOld){
-					Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				if(LeftDialADCScaled < LeftDialADCOld){
-					Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				LeftDialADCOld = LeftDialADCScaled;
 				Delay(500);
@@ -185,22 +157,22 @@ int main()
 			}
 			
 			if(ThrottleMaxFlag == 1){
-				//Show_String(1,&BlankNumber,0x28,0x05);
+				//show_string(1,&BlankNumber,0x28,0x05);
 				ThrottleMaxFlag = 0;
 			}
 			if(ThrottlePercentageData == 100){ ThrottleMaxFlag = 1;	}
 			// If throttle is at 10%, when the throttle goes down, a trailing 0 will be left - this needs to be cleared
 			if(ThrottlePercentageData < 10){ ThrottleGreaterThan10 = 1;	}
 			if(ThrottleGreaterThan10 == 1){
-				//Show_String(1,&BlankNumber,0x28,0x05);
+				//show_string(1,&BlankNumber,0x28,0x05);
 				ThrottleGreaterThan10 = 0;
 			}
 			itoa(ThrottlePercentageData,TempBuffer,10);
 			digitLength = (ThrottlePercentageData == 0 ? 1 : (int)(log10(ThrottlePercentageData)+1));
-			Show_Big_String(&Throttle,0x05,0x64,0x16,0x7F, 12, 0x0F, 0xF0);		
-			Show_String(1,TempBuffer,0x28,0x05);
-			Show_Big_String(&TempBuffer,0x2D,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0); // Print the current throttle percentage
-			Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
+			show_big_string(&Throttle,0x05,0x64,0x16,0x7F, 12, 0x0F, 0xF0);		
+			show_string(1,TempBuffer,0x28,0x05);
+			show_big_string(&TempBuffer,0x2D,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0); // Print the current throttle percentage
+			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
 		}
 		
 		if(LeftDialADCScaled == 4)
@@ -209,10 +181,10 @@ int main()
 			{
 				ADC_Change = 0;
 				if(LeftDialADCScaled > LeftDialADCOld){
-					Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				if(LeftDialADCScaled < LeftDialADCOld){
-					Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				LeftDialADCOld = LeftDialADCScaled;
 				Delay(500);
@@ -224,16 +196,16 @@ int main()
 			if(RPMData < 99){ RPMGreaterThan100 = 1; }
 			if(RPMData < 999){ RPMGreaterThan100 = 1; }
 			if(RPMGreaterThan100 == 1){
-				//Show_String(1,&BlankNumber,0x28,0x15);
+				//show_string(1,&BlankNumber,0x28,0x15);
 				RPMGreaterThan100 = 0;
 			}
 			itoa(RPMData,TempBuffer,10);
 			digitLength = (RPMData == 0 ? 1 : (int)(log10(RPMData)+1));
-			Show_String(1,TempBuffer,0x28,0x05);
-			Show_Big_String(&RPM,0x05,0x64,0x16,0x7F, 5, 0x0F, 0xF0);
-			Show_Big_String(&TempBuffer,0x2D,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0);
-			Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
-			Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
+			show_string(1,TempBuffer,0x28,0x05);
+			show_big_string(&RPM,0x05,0x64,0x16,0x7F, 5, 0x0F, 0xF0);
+			show_big_string(&TempBuffer,0x2D,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0);
+			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
+			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
 		}
 		
 		if(LeftDialADCScaled == 5)
@@ -242,10 +214,10 @@ int main()
 			{
 				ADC_Change = 0;
 				if(LeftDialADCScaled > LeftDialADCOld){
-					Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				if(LeftDialADCScaled < LeftDialADCOld){
-					Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				LeftDialADCOld = LeftDialADCScaled;
 				Delay(500);
@@ -254,11 +226,11 @@ int main()
 			
 			itoa(GearboxTempData,TempBuffer,10);
 			digitLength = (GearboxTempData == 0 ? 1 : (int)(log10(GearboxTempData)+1));
-			Show_String(1,TempBuffer,0x28,0x05);
-			Show_Big_String(&GearboxTemp,0x05,0x64,0x16,0x7F, 14, 0x0F, 0xF0);
-			Show_Big_String(&TempBuffer,0x30,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0);
-			Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
-			Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
+			show_string(1,TempBuffer,0x28,0x05);
+			show_big_string(&GearboxTemp,0x05,0x64,0x16,0x7F, 14, 0x0F, 0xF0);
+			show_big_string(&TempBuffer,0x30,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0);
+			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
+			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
 		}
 		
 		if(LeftDialADCScaled == 6)
@@ -267,10 +239,10 @@ int main()
 			{
 				ADC_Change = 0;
 				if(LeftDialADCScaled > LeftDialADCOld){
-					Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				if(LeftDialADCScaled < LeftDialADCOld){
-					Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				LeftDialADCOld = LeftDialADCScaled;
 				Delay(500);
@@ -280,11 +252,11 @@ int main()
 			itoa(VoltageData/1000, TempBuffer, 10);		//display the average cell voltage in Volts instead of millivolts (find the whole volts in the value)
 			TempBuffer[1] = '.';						//add the decimal point
 			itoa(VoltageData-((VoltageData/1000)*1000), TempBuffer+2, 10);	//add the remaining millivolts
-			Show_String(1,TempBuffer,0x28,0x05);		//display the result.
-			Show_Big_String(&Voltage,0x05,0x64,0x16,0x7F, 9, 0x0F, 0xF0);
-			Show_Big_String(&TempBuffer,0x2D,0x64,0x16,0x7F, 4, 0x0F, 0xF0);
-			Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
-			Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
+			show_string(1,TempBuffer,0x28,0x05);		//display the result.
+			show_big_string(&Voltage,0x05,0x64,0x16,0x7F, 9, 0x0F, 0xF0);
+			show_big_string(&TempBuffer,0x2D,0x64,0x16,0x7F, 4, 0x0F, 0xF0);
+			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
+			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
 		}
 		
 		if(LeftDialADCScaled > 6)
@@ -293,24 +265,24 @@ int main()
 			{
 				ADC_Change = 0;
 				if(LeftDialADCScaled > LeftDialADCOld){
-					Show_Bigger_String(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				if(LeftDialADCScaled < LeftDialADCOld){
-					Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
+					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
 				}
 				LeftDialADCOld = LeftDialADCScaled;
 				Delay(500);
 				fill_ram(CLEAR_SCREEN);
 			}
-			Show_Bigger_String(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
+			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
 		}
 		
 		/*
 		unsigned char c = 0x08;
 		unsigned char d = 0x04;
-		Set_Column_Address(Shift+c,Shift+c);
-		Set_Row_Address(d,d+7);
-		Set_Write_RAM();
+		set_column_address(Shift+c,Shift+c);
+		set_row_address(d,d+7);
+		set_write_ram();
 		Write_Data(0x00);
 		Write_Data(0xF0);
 		//Write_Data(0x77);
@@ -319,9 +291,9 @@ int main()
 		
 		c = 0x08;
 		d = 0x08;
-		Set_Column_Address(Shift+c,Shift+c);
-		Set_Row_Address(d,d+7);
-		Set_Write_RAM();
+		set_column_address(Shift+c,Shift+c);
+		set_row_address(d,d+7);
+		set_write_ram();
 		Write_Data(0x00);
 		Write_Data(0xF0);
 */
@@ -329,57 +301,57 @@ int main()
 		/*
 		while(BootFlag == 0)
 		{
-			Show_String(1,&Acceleration,0x13,0x05);
-			Show_String(1,SkidPad,0x17,0x15);
-			Show_String(1,&AutoCross,0x16,0x25);
-			Show_String(1,&Endurance,0x16,0x35);
+			show_string(1,&Acceleration,0x13,0x05);
+			show_string(1,SkidPad,0x17,0x15);
+			show_string(1,&AutoCross,0x16,0x25);
+			show_string(1,&Endurance,0x16,0x35);
 			test = adc_read(2);
 			test2 = (int)(test >> 2) / 24;
 			
 			if(test2 == 3)
 			{
-				Show_String(1,&BlankNumber,0x05,0x25);
-				Show_String(1,&BlankNumber,0x31,0x25);
-				Show_String(1,&BlankNumber,0x05,0x15);
-				Show_String(1,&BlankNumber,0x31,0x15);
-				Show_String(1,&BlankNumber,0x05,0x35);
-				Show_String(1,&BlankNumber,0x31,0x35);
-				Show_String(1,&SelectionLeft,0x05,0x05);
-				Show_String(1,&SelectionRight,0x31,0x05);
+				show_string(1,&BlankNumber,0x05,0x25);
+				show_string(1,&BlankNumber,0x31,0x25);
+				show_string(1,&BlankNumber,0x05,0x15);
+				show_string(1,&BlankNumber,0x31,0x15);
+				show_string(1,&BlankNumber,0x05,0x35);
+				show_string(1,&BlankNumber,0x31,0x35);
+				show_string(1,&SelectionLeft,0x05,0x05);
+				show_string(1,&SelectionRight,0x31,0x05);
 
 			}
 			if(test2 == 4)
 			{
-				Show_String(1,&BlankNumber,0x05,0x25);
-				Show_String(1,&BlankNumber,0x31,0x25);
-				Show_String(1,&BlankNumber,0x05,0x05);
-				Show_String(1,&BlankNumber,0x31,0x05);
-				Show_String(1,&BlankNumber,0x05,0x35);
-				Show_String(1,&BlankNumber,0x31,0x35);
-				Show_String(1,&SelectionLeft,0x05,0x15);
-				Show_String(1,&SelectionRight,0x31,0x15);
+				show_string(1,&BlankNumber,0x05,0x25);
+				show_string(1,&BlankNumber,0x31,0x25);
+				show_string(1,&BlankNumber,0x05,0x05);
+				show_string(1,&BlankNumber,0x31,0x05);
+				show_string(1,&BlankNumber,0x05,0x35);
+				show_string(1,&BlankNumber,0x31,0x35);
+				show_string(1,&SelectionLeft,0x05,0x15);
+				show_string(1,&SelectionRight,0x31,0x15);
 			}
 			if(test2 == 5)
 			{
-				Show_String(1,&BlankNumber,0x05,0x05);
-				Show_String(1,&BlankNumber,0x31,0x05);
-				Show_String(1,&BlankNumber,0x05,0x15);
-				Show_String(1,&BlankNumber,0x31,0x15);
-				Show_String(1,&BlankNumber,0x05,0x35);
-				Show_String(1,&BlankNumber,0x31,0x35);
-				Show_String(1,&SelectionLeft,0x05,0x25);
-				Show_String(1,&SelectionRight,0x31,0x25);
+				show_string(1,&BlankNumber,0x05,0x05);
+				show_string(1,&BlankNumber,0x31,0x05);
+				show_string(1,&BlankNumber,0x05,0x15);
+				show_string(1,&BlankNumber,0x31,0x15);
+				show_string(1,&BlankNumber,0x05,0x35);
+				show_string(1,&BlankNumber,0x31,0x35);
+				show_string(1,&SelectionLeft,0x05,0x25);
+				show_string(1,&SelectionRight,0x31,0x25);
 			}
 			if(test2 == 6)
 			{
-				Show_String(1,&BlankNumber,0x05,0x25);
-				Show_String(1,&BlankNumber,0x31,0x25);
-				Show_String(1,&BlankNumber,0x05,0x15);
-				Show_String(1,&BlankNumber,0x31,0x15);
-				Show_String(1,&BlankNumber,0x05,0x05);
-				Show_String(1,&BlankNumber,0x31,0x305);
-				Show_String(1,&SelectionLeft,0x05,0x35);
-				Show_String(1,&SelectionRight,0x31,0x35);
+				show_string(1,&BlankNumber,0x05,0x25);
+				show_string(1,&BlankNumber,0x31,0x25);
+				show_string(1,&BlankNumber,0x05,0x15);
+				show_string(1,&BlankNumber,0x31,0x15);
+				show_string(1,&BlankNumber,0x05,0x05);
+				show_string(1,&BlankNumber,0x31,0x305);
+				show_string(1,&SelectionLeft,0x05,0x35);
+				show_string(1,&SelectionRight,0x31,0x35);
 			}
 			
 			// if button press break

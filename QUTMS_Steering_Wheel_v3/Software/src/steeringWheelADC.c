@@ -14,14 +14,14 @@ Function:   adc_init()
 Purpose :   initializes the analog to digital conversion by first selecting 
 			the voltage reference and then setting the ADC Enable bit, ADEN 
 			in ADCSRA
-Input   :   
-Returns :   none
+Input   :   none
+Returns :   void
 Notes   :
 ============================================================================*/
 void adc_init() 
 {
 	ADMUX = (1 << REFS0)|(1 << AREFEN); /* AVcc with external capacitor */
-	CLEAR_BIT(ADMUX, ADLAR); 			/* make sure bits are right adjusted */ 
+	CLEAR_BIT(ADMUX, ADLAR); /* make sure bits are right adjusted */ 
 	ADCSRA = (1 << ADEN)|(1 << ADPS2)|(1 << ADPS1)|(1 << ADPS0); /* prescale div factor = 128, 125kHz */
 }
 
@@ -36,17 +36,14 @@ Notes   :
 ============================================================================*/
 uint16_t adc_read(uint8_t channel) 
 {   
-    //ADMUX | 0b11100000 and channel | 0b00011111 --> this keeps all bits of ADMUX the 
-	//same except for the bits signalling which channel to use.
-    channel = (ADMUX & 0xe0)|(channel & 0x1F);
+    channel = (ADMUX & 0xe0)|(channel & 0x1F); /* only change ADMUX bits signalling which channel to use */
 	ADMUX = channel;
-	SET_BIT(ADCSRA, ADSC); 				/* start conversion process */
-	while(!(CHECK_BIT(ADCSRA, ADIF)));  /* loop while the conversion is taking place */
-	uint16_t result = 0;
-    //read ADCL first, ADCH after --> order is important! 
-	//--> also not sure if this code is correct. other ADC examples return 'ADC' instead.
-	result = ADCL; 								
+	SET_BIT(ADCSRA, ADSC); /* start conversion process */
+	while(!(CHECK_BIT(ADCSRA, ADIF))); /* loop while the conversion is taking place */
+	uint16_t result = 0;	
+	result = ADCL; /* read ADCL, then ADCH --> order is important! */							
 	result |= ((3 & ADCH) << 8);
+	//--> also not sure if this code is correct. other ADC examples return 'ADC' instead. //
 	SET_BIT(ADCSRA, ADIF); /* clear 'complete' status */
 	return result;
 }

@@ -10,6 +10,9 @@
 #ifndef STEERINGWHEELINPUT_H_
 #define STEERINGWHEELINPUT_H_
 
+#define LEFT_DIAL 3
+#define RIGHT_DIAL 2
+
 void read_dials(void);
 void read_buttons(void);
 
