@@ -6,6 +6,15 @@
 * @brief   Communication with the OLED screen
 *****************************************************************************/
 
+//External libraries
+#include <avr/pgmspace.h>
+#include <avr/io.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include <math.h>
+
 #include "steeringWheelSPI.h"
 #include "steeringWheelBitOpr.h"
 
@@ -19,11 +28,11 @@ Notes   :
 ============================================================================*/
 void spi_init()
 {
-     //make sure we are getting spi not on the _A (alternative) spi pins.
+    //make sure we are getting spi not on the _A (alternative) spi pins.
 	CLEAR_BIT(MCUCR, SPIPS);  
     //set interrupt, enable SPI, MSB mode, set as master, low is idle, read on leading edge, Set to speed(fosc/4) SPR0=1, SPR1=0
 	SPCR = (0<<SPIE)|(1<<SPE)|(0<<DORD)|(1<<MSTR)|(0<<CPOL)|(0<<CPHA)|(0<<SPR0)|(0<<SPR1);  
-    //SPSR = (1<<SPI2X);	//set whether we want 2x speed or not (1=2x speed).
+    //set whether we want 2x speed or not (1=2x speed).
 	OVERRIDE_BITS(SPSR, SPI2X); 
     //ensure data register has nothing in it 
 	SPDR = 0x00;		

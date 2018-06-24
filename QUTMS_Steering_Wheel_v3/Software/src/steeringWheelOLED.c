@@ -15,7 +15,18 @@ MAKE SURE BSO PADS 00 ON BACK OF SCREEN ARE SHORTED WITH RESISTORS. VISUALLY PAD
 																				  |  |
 ============================================================================*/
 
+//External libraries
+#include <avr/pgmspace.h>
+#include <avr/io.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include <math.h>
+
 #include "steeringWheelOLED.h"
+#include "steeringWheelSPI.h"
+#include "steeringWheelGraphics.h"
 
 /*============================================================================
 Function:   oled_init()
@@ -30,7 +41,7 @@ void oled_init()
 	unsigned char i;
 
 	RESET_low;
-	Delay(10);
+	delay(10);
 	
 	RESET_high;
 
@@ -68,21 +79,21 @@ void oled_init()
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Delay Time
+//  delay Time
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-void uDelay(unsigned int l)
+void udelay(unsigned int l)
 {
 	while(l--);
 }
 
-void Delay(unsigned int n)
+void delay(unsigned int n)
 {
 	unsigned int k;
 
 	for(k=0;k<n;k++)
 	{
-		uDelay(1120);
+		udelay(1120); // 1 second?
 	}
 }
 
@@ -103,9 +114,9 @@ void write_command(unsigned char Data)
 		if((Data&0x80) > 0)SPI_data_high;
 		else SPI_data_low;
 		Data = Data << 1;
-		//uDelay(1);
+		//udelay(1);
 		SPI_clock_high;
-		//uDelay(1);
+		//udelay(1);
 	}
 	SPI_clock_high;
 	*/	
@@ -311,7 +322,7 @@ void test()
 	unsigned char i;
 
 	RESET_low;
-	Delay(300);
+	delay(300);
 	RESET_high;
 
 	set_display_mode(DISPLAY_ON);			// Entire Display On Mode (0x00/0x01/0x02/0x03)
@@ -319,9 +330,9 @@ void test()
 	while(1)
 	{
 		set_display_on_off(DISPLAY_ON);	// Display On (0x00/0x01)
-		Delay(32);
+		delay(32);
 		set_display_on_off(DISPLAY_OFF);	// Display Off (0x00/0x01)
-		Delay(32);
+		delay(32);
 	}
 }
 

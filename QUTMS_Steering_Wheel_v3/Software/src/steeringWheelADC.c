@@ -6,7 +6,17 @@
 * @brief   Analog to digital conversion
 *****************************************************************************/
 
+//External libraries
+#include <avr/pgmspace.h>
+#include <avr/io.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include <math.h>
+
 #include "steeringWheelADC.h"
+#include "steeringWheelBitOpr.h"
 
 /*============================================================================
 Function:   adc_init()

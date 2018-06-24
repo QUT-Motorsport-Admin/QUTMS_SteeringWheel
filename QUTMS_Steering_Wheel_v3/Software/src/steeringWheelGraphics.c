@@ -6,7 +6,18 @@
 * @brief   Functions for creating graphics on the OLED display
 *****************************************************************************/
 
+//External libraries
+#include <avr/pgmspace.h>
+#include <avr/io.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include <math.h>
+
 #include "steeringWheelGraphics.h"
+#include "steeringWheelFonts.h"
+#include "steeringWheelOLED.h"
 
 /*============================================================================
 Function:   draw_rectangle()
@@ -914,7 +925,7 @@ Input   :   unsigned char pic[] - an array of hexidecimal values
 Returns :   return
 Notes   :
 ============================================================================*/
-void display_picture(unsigned char pic[])
+void display_picture(const unsigned char pic[])
 {
 	unsigned char i,j;
 	set_column_address(Shift+0x00,Shift+0x77);
@@ -955,7 +966,7 @@ void vertical_scroll(unsigned char a, unsigned char b, unsigned char c)
 			set_display_offset(i+1);
 			for(j=0;j<c;j++)
 			{
-				uDelay(1600);
+				udelay(1600);
 			}
 		}
 		break;
@@ -965,7 +976,7 @@ void vertical_scroll(unsigned char a, unsigned char b, unsigned char c)
 			set_display_offset(Max_Row-i);
 			for(j=0;j<c;j++)
 			{
-				uDelay(1600);
+				udelay(1600);
 			}
 		}
 		break;
@@ -998,13 +1009,13 @@ void fade_scroll(unsigned char a, unsigned char b, unsigned char c)
 			set_start_line(i);
 			for(j=0;j<c;j++)
 			{
-				uDelay(200);
+				udelay(200);
 			}
 		}
 		set_start_line(0x00);
 		for(j=0;j<c;j++)
 		{
-			uDelay(200);
+			udelay(200);
 		}
 		break;
 		case 1:
@@ -1013,7 +1024,7 @@ void fade_scroll(unsigned char a, unsigned char b, unsigned char c)
 			set_start_line(Max_Row-i);
 			for(j=0;j<c;j++)
 			{
-				uDelay(200);
+				udelay(200);
 			}
 		}
 		break;
@@ -1023,7 +1034,7 @@ void fade_scroll(unsigned char a, unsigned char b, unsigned char c)
 			set_start_line(i+1);
 			for(j=0;j<c;j++)
 			{
-				uDelay(200);
+				udelay(200);
 			}
 		}
 		break;
@@ -1033,7 +1044,7 @@ void fade_scroll(unsigned char a, unsigned char b, unsigned char c)
 			set_start_line(i);
 			for(j=0;j<c;j++)
 			{
-				uDelay(200);
+				udelay(200);
 			}
 		}
 		break;
@@ -1057,9 +1068,9 @@ void fade_in()
 	for(i=0;i<(Brightness+1);i++)
 	{
 		set_master_current(i);
-		uDelay(200);
-		uDelay(200);
-		uDelay(200);
+		udelay(200);
+		udelay(200);
+		udelay(200);
 	}
 }
 
@@ -1078,9 +1089,9 @@ void fade_out()
 	for(i=(Brightness+1);i>0;i--)
 	{
 		set_master_current(i-1);
-		uDelay(200);
-		uDelay(200);
-		uDelay(200);
+		udelay(200);
+		udelay(200);
+		udelay(200);
 	}
 	set_display_on_off(0x00);
 }

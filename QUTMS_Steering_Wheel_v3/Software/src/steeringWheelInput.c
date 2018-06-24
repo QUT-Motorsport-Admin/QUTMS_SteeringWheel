@@ -6,47 +6,63 @@
 * @brief   
 *****************************************************************************/
 
+//External libraries
+#include <avr/pgmspace.h>
+#include <avr/io.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include <math.h>
+
 #include "steeringWheelInput.h"
+#include "steeringWheelBitOpr.h"
+#include "steeringWheelADC.h"
+#include "steeringWheelCAN.h"
+//#include "steeringWheelFunctions.h"
+
+
+/*
+//12-position rotary switch
+const int firstRotaryPin = 7;
+const int lastRotaryPin = 26;
+
+void read_rotary_switch(void) {
+	// Switch 1 == right  sw1
+	// Swtitch 2 == left  sw2
+	// rotary pins left  17-26,33
+	// rotary pins right  7-16
+	for( int i=firstRotaryPin; i<= lastRotaryPin; i++) { 
+    int val = digitalRead( i ); // look at a rotary switch input adc_read()
+    if( val == LOW ) { // it's selected
+      return (i - firstRotaryPin + 1); // return a value that ranges 1 - 5
+    }
+  }
+  return 0; // error case
+}
+
+// main
+	int rotary_pos = read_rotary_switch();
+	if (rotary_pos == 7) {
+
+	}
+
+*/
+
 
 /*============================================================================
-Function:   read_dials()
+Function:   button_init()
 ------------------------------------------------------------------------------
-Purpose :   reads input from dials on steering wheel 
+Purpose :   sets DDR's to enable input from the buttons on the steering wheel 
 Input   :   none
 Returns :   none
-Notes   :
+Notes   :	not tested
 ============================================================================*/
-void read_dials(void)
-{
-	uint8_t counter = 0;
-	uint16_t SwitchRight;
-	uint16_t SwitchLeft;
-	uint16_t SwitchRight2;
-	uint16_t SwitchLeft2;
-	SwitchRight = adc_read(2);
-	SwitchLeft = adc_read(3);
-	/*while(1)
-	{
-		// Pseudo debouncing
-
-		if(SwitchRight == SwitchRight2)
-		{
-			break;			
-		}
-		if(SwitchLeft == SwitchLeft2)
-		{
-			break;
-		}
-	}*/	
-	int intSwitchLeft = (SwitchLeft >> 2) / 24;
-	int intSwitchRight = (SwitchRight >> 2) / 24;
-	unsigned char SwitchLeftBuffer[10];
-	unsigned char SwitchRightBuffer[10];
-	itoa(intSwitchRight,SwitchRightBuffer,10);
-	itoa(intSwitchLeft,SwitchLeftBuffer,10);
-	strcat(SwitchLeftBuffer,SwitchRightBuffer);
-	//Show_String(1,&SwitchLeftBuffer,0x28,0x05);
-	CAN_Dial = intSwitchRight | (intSwitchLeft<<4);
+void button_init(void) {
+	// Buttton one (left maybe? test later) set port to input
+	CLEAR_BIT(DDRC, 0);
+	// Button two (right maybe?)
+    CLEAR_BIT(DDRC, 1);
 }
 
 /*============================================================================
@@ -58,5 +74,13 @@ Returns :   none
 Notes   :	not started yet
 ============================================================================*/
 void read_buttons(void) {
+	// when button one pressed
+	if (BIT_IS_SET(PINC, 0)) {
+		// do stuff
+	}
+	// when button two pressed
+	if (BIT_IS_SET(PINC, 1)) {
+		// do stuff
+	}
 	//do stuff...
 }

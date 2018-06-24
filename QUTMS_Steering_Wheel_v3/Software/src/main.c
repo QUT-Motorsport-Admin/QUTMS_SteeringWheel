@@ -20,30 +20,33 @@
 #include "steeringWheelOLED.h"
 #include "steeringWheelGraphics.h"
 #include "steeringWheelBitOpr.h"
-#include "steeringWheelBitmaps.h"
+//#include "steeringWheelBitmaps.h"
 #include "steeringWheelFunctions.h"
 #include "main.h"
 
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  ISR
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+/*
+// Global variables
 uint16_t ThrottlePercentageData = 0;
 uint32_t RPMData = 0;
 uint32_t GearboxTempData = 0;
 uint32_t VoltageData = 0;
 uint8_t CAN_Dial = 0;
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  ISR
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+*/
 
 ISR(INT3_vect)
 {
 	SMCR = (0<<SM2)|(0<<SM1)|(1<<SM0)|(0<<SE);  //disable the mode, and disable the enable bit.
 	// or SMCR = 2
 }
-
+/*
 ISR(CAN_INT_vect)
 {
 	//uint8_t authority;
-	int8_t mob;
+	//int8_t mob;
 	if( (CHECK_BIT(CANSIT2, SIT5)))  //(CANSIT2 & (1 << SIT5)))	//we received a CAN message on mob 5, which is set up to receive exclusively from the AMU.
 	{
 		
@@ -66,6 +69,7 @@ ISR(CAN_INT_vect)
 	CANPAGE = (4 << 4);
 	CLEAR_BIT(CANSTMOB, RXOK); // CANSTMOB &= ~(1 << RXOK);	//unset the RXOK bit to clear the interrupt.
 }
+*/
 
 // ADDRESS TO LISTEN FOR: 10010000000000000000000000001
 // FIRST UNSIGNED INT: THROTTLE
@@ -78,312 +82,12 @@ ISR(CAN_INT_vect)
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 int main(void)
 {
-	DDRB = 0b11100011;	//b7 - SCK; b1 - MOSI
-	//DDRC &= ~(1 << PINC0);
-	DDRD = 0b00001001;	//b3 - SS pin
-	SPI_clock_high;
-	
+	// Initialise steering functionality: buttons, oled etc..
 	steering_wheel_init();
-	
-	// Globals
-	// If using show_string, append 0x00 as an extra character on end of the string, eg: unsigned char Acceleration[]= {'A','C','C','E','L','E','R','A','T','I','O','N',0x00};
-	unsigned char Acceleration[]= {'A','C','C','E','L','E','R','A','T','I','O','N'};
-	unsigned char SkidPad[]= {'S','K','I','D','P','A','D'};
-	unsigned char AutoCross[]= {'A','U','T','O','C','R','O','S','S'};
-	unsigned char Endurance[]= {'E','N','D','U','R','A','N,','C','E'};
-	unsigned char SelectionRight[]= {'>','>','>','>'};
-	unsigned char SelectionLeft[]= {'<','<','<','<'};
-	unsigned char Voltage[]= {'V','O','L','T','A','G','E',' ',':'};
-	unsigned char RPM[] = {'R','P','M',' ',':'};
-	unsigned char GearboxTemp[] = {'G','E','A','R','B','O','X',' ','T','E','M','P',' ',':'};
-	unsigned char Throttle[]= {'T','H','R','O','T','T','L','E',' ','%',' ',':'};
-	unsigned char BlankNumber[] = {' ',' ',' ',' ',' '};
-	unsigned char LeftArrow[]= {'<'};
-	unsigned char RightArrow[]= {'>'};
-	unsigned char TempBuffer[10];
-	unsigned int RPMMaxFlag = 0;
-	unsigned int ThrottleMaxFlag = 0;
-	unsigned int ThrottleGreaterThan10 = 0;
-	unsigned int RPMGreaterThan100 = 0;
-	unsigned int RPMGreaterThan1000 = 0;
-	unsigned int GearboxTempCount = 0;
-	unsigned int GearboxTempMaxFlag = 0;
-	unsigned int RPMCounter = 0;
-	unsigned int BootFlag = 0;
-	int ScreenFlag = 0;
-	int ADC_Change = 1;
-	int ADC_Previous = 0;
-	int digitLength = 0;
-	uint16_t LeftDialADC;
-	uint16_t LeftDialADCOld = 0;
-	int LeftDialADCScaled;
-	uint16_t RightDialADC;
-	uint16_t RightDialADCOld = 0;
-	int RightDialADCScaled;
-	uint8_t mob;
-	///
-		
+			
 	while(1)
 	{	
-		read_dials();
-		LeftDialADC = adc_read(LEFT_DIAL);
-		LeftDialADCScaled = (int)(LeftDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
-		RightDialADC = adc_read(RIGHT_DIAL);
-		RightDialADCScaled = (int)(RightDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
-		mob = CAN_findFreeTXMOB();
-		//if(mob > 0)
-		can_tx_mob(0, 1, &CAN_Dial, 0x400001,0);
-		_delay_ms(100);
-		
-		if((LeftDialADCOld != LeftDialADCScaled) /*|| (RightDialADCOld != RightDialADCScaled)*/)
-		{
-			ADC_Change = 1;
-		}
-		
-		if(LeftDialADCScaled == 3)
-		{					
-			if(ADC_Change == 1)
-			{
-				ADC_Change = 0;
-				if(LeftDialADCScaled > LeftDialADCOld){
-					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				if(LeftDialADCScaled < LeftDialADCOld){
-					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				LeftDialADCOld = LeftDialADCScaled;
-				Delay(500);
-				fill_ram(CLEAR_SCREEN);
-			}
-			
-			if(ThrottleMaxFlag == 1){
-				//show_string(1,&BlankNumber,0x28,0x05);
-				ThrottleMaxFlag = 0;
-			}
-			if(ThrottlePercentageData == 100){ ThrottleMaxFlag = 1;	}
-			// If throttle is at 10%, when the throttle goes down, a trailing 0 will be left - this needs to be cleared
-			if(ThrottlePercentageData < 10){ ThrottleGreaterThan10 = 1;	}
-			if(ThrottleGreaterThan10 == 1){
-				//show_string(1,&BlankNumber,0x28,0x05);
-				ThrottleGreaterThan10 = 0;
-			}
-			itoa(ThrottlePercentageData,TempBuffer,10);
-			digitLength = (ThrottlePercentageData == 0 ? 1 : (int)(log10(ThrottlePercentageData)+1));
-			show_big_string(&Throttle,0x05,0x64,0x16,0x7F, 12, 0x0F, 0xF0);		
-			show_string(1,TempBuffer,0x28,0x05);
-			show_big_string(&TempBuffer,0x2D,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0); // Print the current throttle percentage
-			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
-		}
-		
-		if(LeftDialADCScaled == 4)
-		{
-			if(ADC_Change == 1)
-			{
-				ADC_Change = 0;
-				if(LeftDialADCScaled > LeftDialADCOld){
-					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				if(LeftDialADCScaled < LeftDialADCOld){
-					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				LeftDialADCOld = LeftDialADCScaled;
-				Delay(500);
-				fill_ram(CLEAR_SCREEN);
-			}
-			
-			// If RPM is greater than 100 (or 1000), when the throttle goes down, a trailing 0 will be left
-			// This needs to be cleared
-			if(RPMData < 99){ RPMGreaterThan100 = 1; }
-			if(RPMData < 999){ RPMGreaterThan100 = 1; }
-			if(RPMGreaterThan100 == 1){
-				//show_string(1,&BlankNumber,0x28,0x15);
-				RPMGreaterThan100 = 0;
-			}
-			itoa(RPMData,TempBuffer,10);
-			digitLength = (RPMData == 0 ? 1 : (int)(log10(RPMData)+1));
-			show_string(1,TempBuffer,0x28,0x05);
-			show_big_string(&RPM,0x05,0x64,0x16,0x7F, 5, 0x0F, 0xF0);
-			show_big_string(&TempBuffer,0x2D,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0);
-			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
-			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
-		}
-		
-		if(LeftDialADCScaled == 5)
-		{
-			if(ADC_Change == 1)
-			{
-				ADC_Change = 0;
-				if(LeftDialADCScaled > LeftDialADCOld){
-					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				if(LeftDialADCScaled < LeftDialADCOld){
-					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				LeftDialADCOld = LeftDialADCScaled;
-				Delay(500);
-				fill_ram(CLEAR_SCREEN);
-			}
-			
-			itoa(GearboxTempData,TempBuffer,10);
-			digitLength = (GearboxTempData == 0 ? 1 : (int)(log10(GearboxTempData)+1));
-			show_string(1,TempBuffer,0x28,0x05);
-			show_big_string(&GearboxTemp,0x05,0x64,0x16,0x7F, 14, 0x0F, 0xF0);
-			show_big_string(&TempBuffer,0x30,0x64,0x16,0x7F, digitLength, 0x0F, 0xF0);
-			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
-			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
-		}
-		
-		if(LeftDialADCScaled == 6)
-		{
-			if(ADC_Change == 1)
-			{
-				ADC_Change = 0;
-				if(LeftDialADCScaled > LeftDialADCOld){
-					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				if(LeftDialADCScaled < LeftDialADCOld){
-					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				LeftDialADCOld = LeftDialADCScaled;
-				Delay(500);
-				fill_ram(CLEAR_SCREEN);
-			}
-			
-			itoa(VoltageData/1000, TempBuffer, 10);		//display the average cell voltage in Volts instead of millivolts (find the whole volts in the value)
-			TempBuffer[1] = '.';						//add the decimal point
-			itoa(VoltageData-((VoltageData/1000)*1000), TempBuffer+2, 10);	//add the remaining millivolts
-			show_string(1,TempBuffer,0x28,0x05);		//display the result.
-			show_big_string(&Voltage,0x05,0x64,0x16,0x7F, 9, 0x0F, 0xF0);
-			show_big_string(&TempBuffer,0x2D,0x64,0x16,0x7F, 4, 0x0F, 0xF0);
-			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
-			show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x04, 0x40);
-		}
-		
-		if(LeftDialADCScaled > 6)
-		{
-			if(ADC_Change == 1)
-			{
-				ADC_Change = 0;
-				if(LeftDialADCScaled > LeftDialADCOld){
-					show_bigger_string(&RightArrow,0x3A,0x60,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				if(LeftDialADCScaled < LeftDialADCOld){
-					show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x0F, 0xF0);
-				}
-				LeftDialADCOld = LeftDialADCScaled;
-				Delay(500);
-				fill_ram(CLEAR_SCREEN);
-			}
-			show_bigger_string(&LeftArrow,0x00,0x15,0x11,0x7F, 1, 0x04, 0x40);
-		}
-		
-		/*
-		unsigned char c = 0x08;
-		unsigned char d = 0x04;
-		set_column_address(Shift+c,Shift+c);
-		set_row_address(d,d+7);
-		set_write_ram();
-		Write_Data(0x00);
-		Write_Data(0xF0);
-		//Write_Data(0x77);
-		//Write_Data(0xFF);
-		//Write_Data(0xFF);
-		
-		c = 0x08;
-		d = 0x08;
-		set_column_address(Shift+c,Shift+c);
-		set_row_address(d,d+7);
-		set_write_ram();
-		Write_Data(0x00);
-		Write_Data(0xF0);
-*/
-	
-		/*
-		while(BootFlag == 0)
-		{
-			show_string(1,&Acceleration,0x13,0x05);
-			show_string(1,SkidPad,0x17,0x15);
-			show_string(1,&AutoCross,0x16,0x25);
-			show_string(1,&Endurance,0x16,0x35);
-			test = adc_read(2);
-			test2 = (int)(test >> 2) / 24;
-			
-			if(test2 == 3)
-			{
-				show_string(1,&BlankNumber,0x05,0x25);
-				show_string(1,&BlankNumber,0x31,0x25);
-				show_string(1,&BlankNumber,0x05,0x15);
-				show_string(1,&BlankNumber,0x31,0x15);
-				show_string(1,&BlankNumber,0x05,0x35);
-				show_string(1,&BlankNumber,0x31,0x35);
-				show_string(1,&SelectionLeft,0x05,0x05);
-				show_string(1,&SelectionRight,0x31,0x05);
-
-			}
-			if(test2 == 4)
-			{
-				show_string(1,&BlankNumber,0x05,0x25);
-				show_string(1,&BlankNumber,0x31,0x25);
-				show_string(1,&BlankNumber,0x05,0x05);
-				show_string(1,&BlankNumber,0x31,0x05);
-				show_string(1,&BlankNumber,0x05,0x35);
-				show_string(1,&BlankNumber,0x31,0x35);
-				show_string(1,&SelectionLeft,0x05,0x15);
-				show_string(1,&SelectionRight,0x31,0x15);
-			}
-			if(test2 == 5)
-			{
-				show_string(1,&BlankNumber,0x05,0x05);
-				show_string(1,&BlankNumber,0x31,0x05);
-				show_string(1,&BlankNumber,0x05,0x15);
-				show_string(1,&BlankNumber,0x31,0x15);
-				show_string(1,&BlankNumber,0x05,0x35);
-				show_string(1,&BlankNumber,0x31,0x35);
-				show_string(1,&SelectionLeft,0x05,0x25);
-				show_string(1,&SelectionRight,0x31,0x25);
-			}
-			if(test2 == 6)
-			{
-				show_string(1,&BlankNumber,0x05,0x25);
-				show_string(1,&BlankNumber,0x31,0x25);
-				show_string(1,&BlankNumber,0x05,0x15);
-				show_string(1,&BlankNumber,0x31,0x15);
-				show_string(1,&BlankNumber,0x05,0x05);
-				show_string(1,&BlankNumber,0x31,0x305);
-				show_string(1,&SelectionLeft,0x05,0x35);
-				show_string(1,&SelectionRight,0x31,0x35);
-			}
-			
-			// if button press break
-			if(PINC & (1<<PC0) == 0)
-			{
-				fill_ram(0x00);			// Clear Screen
-				Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x00,0x10);
-				Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x11,0x20);
-				Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x21,0x30);
-				Draw_Rectangle(0xFF,0x01,0x00,0x3F,0x31,0x3F);
-				// send message to chassis controller regarding current dial state  
-				BootFlag = 1;
-			}
-			
-		}
-
-	*/	
-		
-		// if button press return back to boot menu
-		//if(PINC & (1<<PC0) == 0)
-		//{
-		//	BootFlag = 0;
-		//}
-		
-		
-		// If throttle is at 100%, when the throttle goes down, a trailing 0 will be left
-		// This needs to be cleared 
-		
-		//_delay_ms(5); 
-		
+		update_screen();		
 	}	
 	return 0;
 }
-
-//implement speed, heat, battery amount, race mode, 

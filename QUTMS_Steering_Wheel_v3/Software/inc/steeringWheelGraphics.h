@@ -10,7 +10,7 @@
 #ifndef STEERINGWHEELGRAPHICS_H_
 #define STEERINGWHEELGRAPHICS_H_
 
-#include "steeringWheelOLED.h"
+
 
 // Fill ram
 #define CLEAR_SCREEN 0x00
@@ -42,7 +42,7 @@ void show_big_char(unsigned char data, unsigned char a, unsigned char b, unsigne
 
 void show_pattern(unsigned char *data_pointer, unsigned char a, unsigned char b, unsigned char c, unsigned char d);
 
-void display_picture(unsigned char pic[]);
+void display_picture(const unsigned char pic[]);
 
 void vertical_scroll(unsigned char a, unsigned char b, unsigned char c);
 void fade_scroll(unsigned char a, unsigned char b, unsigned char c);

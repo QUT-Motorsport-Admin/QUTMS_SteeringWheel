@@ -11,7 +11,7 @@
 #define STEERINGWHEELFUNCTIONS_H_ 
 
 // Includes
-#include "steeringWheelBitmaps.h"
+
 
 #define N_PARROT 10 // number of frames for party parrot
 
@@ -19,5 +19,17 @@
 void steering_wheel_init();
 void splash_screen();
 void party_mode();
+void emergency();
+void update_screen();
+
+void endurance();
+void acceleration();
+void skidpad();
+void auto_cross();
+
+void sudo_update_screen();
+void main_menu();
+
+
 
 #endif /* STEERINGWHEELFUNCTIONS_H_ */

@@ -15,5 +15,6 @@
 
 void read_dials(void);
 void read_buttons(void);
+void button_init(void);
 
 #endif /* STEERINGWHEELINPUT_H_ */

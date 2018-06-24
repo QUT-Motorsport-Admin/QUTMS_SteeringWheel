@@ -17,6 +17,7 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 
+
  // Dimensions of the OLED Screen
 #define OLED_X     256
 #define OLED_Y     64
@@ -66,7 +67,7 @@ void oled_init();
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 void write_command(unsigned char Data);
 
-void Write_Data(unsigned char Data);
+void write_data(unsigned char Data);
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Instruction Setting
@@ -139,5 +140,8 @@ void sleep(unsigned char a);
 //  Connection Test
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 void test();
+
+void delay(unsigned int n);
+void udelay(unsigned int l);
 
 #endif /* STEERINGWHEELOLED_H_ */
