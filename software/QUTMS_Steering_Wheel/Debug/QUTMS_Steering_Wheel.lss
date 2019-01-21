@@ -15,19 +15,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 00000270  00000000  00000000  00005f48  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00001efe  00000000  00000000  000061b8  2**0
+  6 .debug_info   0000293e  00000000  00000000  000061b8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000513  00000000  00000000  000080b6  2**0
+  7 .debug_abbrev 00000ec5  00000000  00000000  00008af6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000022ba  00000000  00000000  000085c9  2**0
+  8 .debug_line   000022d4  00000000  00000000  000099bb  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000a58  00000000  00000000  0000a884  2**2
+  9 .debug_frame  00000a58  00000000  00000000  0000bc90  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000910  00000000  00000000  0000b2dc  2**0
+ 10 .debug_str    00000ce9  00000000  00000000  0000c6e8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000166d  00000000  00000000  0000bbec  2**0
+ 11 .debug_loc    0000166d  00000000  00000000  0000d3d1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000258  00000000  00000000  0000d259  2**0
+ 12 .debug_ranges 00000258  00000000  00000000  0000ea3e  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -104,7 +104,7 @@ Disassembly of section .text:
       c6:	3e 4c       	sbci	r19, 0xCE	; 206
       c8:	80 ef       	ldi	r24, 0xF0	; 240
       ca:	ff be       	out	0x3f, r15	; 63
-      cc:	01 c4       	rjmp	.+2050   	; 0x8d0 <__FUSE_REGION_LENGTH__+0x4d0>
+      cc:	01 c4       	rjmp	.+2050   	; 0x8d0 <__LOCK_REGION_LENGTH__+0x4d0>
       ce:	ff 7f       	andi	r31, 0xFF	; 255
       d0:	3f 00       	.word	0x003f	; ????
       d2:	00 00       	nop
