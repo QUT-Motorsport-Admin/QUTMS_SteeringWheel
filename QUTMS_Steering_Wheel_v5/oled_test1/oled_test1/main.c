@@ -42,8 +42,35 @@ unsigned char breakDataArray[10];
 //unsigned char otherData[10];
 unsigned char Super[] = "Azoz158";
 //"supPeeps69";
+//https://www.diffnow.com/compare-files
 
 
+uint16_t countDigits(uint16_t tempInt){
+	unsigned char intCountingArray[10];
+	sprintf(intCountingArray, "%d", tempInt);
+	for(uint8_t i = 0; i < sizeof intCountingArray; i++){
+		if(intCountingArray[i] == '\0'){
+			return i;
+		}
+	}
+}
+
+void parseCharArrayForDisplay(unsigned char temp[], uint16_t maximumNumberExpected){
+	uint16_t digitsNumber = 0;
+	for(uint8_t i = 0; i < sizeof temp; i++){
+		if(temp[i] == '\0'){
+			digitsNumber = countDigits(maximumNumberExpected);
+			for (uint8_t k = 0; k < digitsNumber; k++)
+			{
+				temp[i+k] = '`';
+				if(k == digitsNumber - 1){
+					temp[i+k] = '\0';
+				}
+			}
+			i = sizeof temp;
+		}
+	}
+}
 
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Main Program
@@ -115,7 +142,7 @@ int main()
 
 	while(1)
 	{
-		/*
+		
 		readDials();
 		LeftDialADC = ADC_read(3); // 3 = LEFT DIAL
 		LeftDialADCScaled = (int)(LeftDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
@@ -124,7 +151,6 @@ int main()
 		//mob = CAN_findFreeTXMOB();
 		//radPoint = readDials();
 		//CAN_TXMOB(0, 1, &radPoint, 0x400001,0);
-		*/
 		//Display_Picture(Motorsport);
 
 		sprintf(Charge, "%d", ThrottlePercentageData);
@@ -132,34 +158,19 @@ int main()
 		sprintf(PotDataArray, "%d", PotData);
 
 		//	\0
-		
+		/*
 		for(uint8_t i = 0; i < sizeof Charge; i++){
 			if(Charge[i] == '\0'){
 				Charge[i] = '`';
 				Charge[i+1] = '`';
-				Charge[i+2] = "0";//0x2302;
+				Charge[i+2] = '\0';//0x2302;
 				i = sizeof Charge;
 			}
 		}
-		
-		for(uint8_t i = 0; i < sizeof breakDataArray; i++){
-			if(breakDataArray[i] == '\0'){
-				breakDataArray[i] = '`';
-				breakDataArray[i+1] = '`';
-				breakDataArray[i+2] = "0";//0x2302;
-				i = sizeof breakDataArray;
-			}
-		}
-
-		for(uint8_t i = 0; i < sizeof PotDataArray; i++){
-			if(PotDataArray[i] == '\0'){
-				PotDataArray[i] = '`';
-				PotDataArray[i+1] = '`';
-				PotDataArray[i+2] = "0";//0x2302;
-				i = sizeof PotDataArray;
-			}
-		}
-		
+		*/
+		parseCharArrayForDisplay(Charge, 75);
+		parseCharArrayForDisplay(breakDataArray, 100);
+		parseCharArrayForDisplay(PotDataArray, 100);
 
 		Delay(100);
 
