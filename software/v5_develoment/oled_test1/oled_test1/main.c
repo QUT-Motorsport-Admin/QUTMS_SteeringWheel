@@ -30,14 +30,23 @@ uint32_t GearboxTempData = 0;
 uint32_t VoltageData = 0;
 uint8_t radPoint;
 
-unsigned char MTemp1[] = "Throttle:";
-unsigned char MTemp2[] = "Break:";
-unsigned char MTemp3[] = "Potentiometer:";
+unsigned char *firstLinePointer;// = "Throttle:";
+unsigned char *secondLinePointer;// = "Break:";
+unsigned char *thirdLinePointer;// = "Potentiometer:";
+
+unsigned char emptyAll[] = "`";
+
 unsigned char MTemp4[] = "supPeeps69";
 
-unsigned char Charge[10];
-unsigned char PotDataArray[10];
-unsigned char breakDataArray[10];
+unsigned char throttleArray[] = "Throttle:";
+unsigned char BreakArray[] = "Break:";
+unsigned char PotArray[] = "Potentiometer:";
+unsigned char leftMotionArray[] = "Left`Dial:";
+unsigned char leftMotionValueArray[] = "LeftDialValue:";
+
+unsigned char firstLineValue[10];
+unsigned char secondLineValue[10];
+unsigned char thirdLineValue[10];
 
 //unsigned char otherData[10];
 unsigned char Super[] = "Azoz158";
@@ -105,7 +114,7 @@ int main()
 	//Fill_RAM(0x00);
 
 	uint16_t LeftDialADC;
-	int LeftDialADCScaled;
+	uint16_t LeftDialADCScaled;
 	uint16_t RightDialADC;
 	int RightDialADCScaled;
 	uint8_t mob;
@@ -139,53 +148,100 @@ int main()
 	int digitLength = 0;
 	uint16_t LeftDialADCOld = 0;
 	uint16_t RightDialADCOld = 0;
+	
+	uint16_t chargeMax = 0;
+	uint16_t breakDataMax = 0;
+	uint16_t potDataMax = 0;
+	
+	uint16_t LeftDialADCScaledOld = 0;
+	
+	uint16_t isScreenChanged = 0;
 
 	while(1)
 	{
 		
 		readDials();
 		LeftDialADC = ADC_read(3); // 3 = LEFT DIAL
-		LeftDialADCScaled = (int)(LeftDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
-		RightDialADC = ADC_read(2); // 2 = RIGHT DIAL
-		RightDialADCScaled = (int)(RightDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
+		LeftDialADCScaled = (uint16_t)(LeftDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
+		//RightDialADC = ADC_read(2); // 2 = RIGHT DIAL
+		//RightDialADCScaled = (int)(RightDialADC >> 2) / 24; // Scale values from 1 to 8 - need to verify with new PCB since dials are playing up
 		//mob = CAN_findFreeTXMOB();
 		//radPoint = readDials();
 		//CAN_TXMOB(0, 1, &radPoint, 0x400001,0);
 		//Display_Picture(Motorsport);
-
-		sprintf(Charge, "%d", ThrottlePercentageData);
-		sprintf(breakDataArray, "%d", BreakData);
-		sprintf(PotDataArray, "%d", PotData);
-
-		//	\0
-		/*
-		for(uint8_t i = 0; i < sizeof Charge; i++){
-			if(Charge[i] == '\0'){
-				Charge[i] = '`';
-				Charge[i+1] = '`';
-				Charge[i+2] = '\0';//0x2302;
-				i = sizeof Charge;
-			}
+		
+		
+		//if((LeftDialADCOld != LeftDialADCScaled) /*|| (RightDialADCOld != RightDialADCScaled)*/)
+		//{
+			//ADC_Change = 1;
+		//}
+		
+		if (LeftDialADCScaledOld != LeftDialADCScaled)
+		{
+			LeftDialADCScaledOld = LeftDialADCScaled;
+			Fill_RAM(0x00);
+			Delay(500);
 		}
+		
+		
+		if (LeftDialADCScaled == 1)
+		{
+			sprintf(firstLineValue, "%d", ThrottlePercentageData);
+			sprintf(secondLineValue, "%d", BreakData);
+			sprintf(thirdLineValue, "%d", PotData);
+			firstLinePointer = throttleArray;
+			secondLinePointer = BreakArray;
+			thirdLinePointer = PotArray;
+			chargeMax = 75;
+			breakDataMax = 100;
+			potDataMax = 100;
+			
+		}else if (LeftDialADCScaled == 2)
+		{
+			sprintf(firstLineValue, "%d", LeftDialADC);
+			sprintf(secondLineValue, "%c", "'");
+			sprintf(thirdLineValue, "%d", LeftDialADCScaled);
+			
+			firstLinePointer = leftMotionArray;
+			secondLinePointer = emptyAll;
+			thirdLinePointer = leftMotionValueArray;
+			chargeMax = 1023;
+			breakDataMax = 0;
+			potDataMax = 100;
+		}else{
+			sprintf(firstLineValue, "%c", "'");
+			sprintf(secondLineValue, "%c", "'");
+			sprintf(thirdLineValue, "%c", "'");
+			
+			firstLinePointer = emptyAll;
+			secondLinePointer = emptyAll;
+			thirdLinePointer = emptyAll;
+		}
+		
+		/*
+		//sprintf(Charge, "%d", ThrottlePercentageData);
+		sprintf(Charge, "%d", LeftDialADC);
+		sprintf(breakDataArray, "%d", BreakData);
+		//sprintf(PotDataArray, "%d", PotData);
+		sprintf(PotDataArray, "%d", LeftDialADCScaled);
 		*/
-		parseCharArrayForDisplay(Charge, 75);
-		parseCharArrayForDisplay(breakDataArray, 100);
-		parseCharArrayForDisplay(PotDataArray, 100);
+		parseCharArrayForDisplay(firstLineValue, chargeMax);
+		parseCharArrayForDisplay(secondLineValue, breakDataMax);
+		parseCharArrayForDisplay(thirdLineValue, potDataMax);
 
 		Delay(100);
 
 		//Fill_RAM(0x00);			// Clear Screen
-
 		//Delay(10);
 		
-		Show_String(1,&MTemp1,0x05,0x05);
-		Show_String(1,&Charge,0x27,0x05);
+		Show_String(1,&(*firstLinePointer),0x05,0x05);
+		Show_String(1,&firstLineValue,0x27,0x05);
 
-		Show_String(1,&MTemp2,0x05,0x15);
-		Show_String(1,&breakDataArray,0x27,0x15);
+		Show_String(1,&(*secondLinePointer),0x05,0x15);
+		Show_String(1,&secondLineValue,0x27,0x15);
 
-		Show_String(1,&MTemp3,0x05,0x25);
-		Show_String(1,&PotDataArray,0x27,0x25);
+		Show_String(1,&(*thirdLinePointer),0x05,0x25);
+		Show_String(1,&thirdLineValue,0x27,0x25);
 	}
 	
 	return 0;
@@ -230,36 +286,14 @@ ISR(INT3_vect)
 
 ISR(CAN_INT_vect)
 {
-	//uint8_t authority;
-	//int8_t mob;
 	if((CANSIT2 & (1 << SIT5)))	//we received a CAN message on mob 5, which is set up to receive exclusively from the AMU.
-	{
-		//memset(PotDataArray, 0, sizeof PotDataArray);
-		
+	{		
 		CANPAGE = (5 << 4);			//set the canpage to the receiver MOB
 		ThrottlePercentageData = CANMSG;
-		//ThrottlePercentageData = CANMSG << 8;
-		//ThrottlePercentageData += CANMSG;
-		//ThrottlePercentageData = ThrottlePercentageData * 100 /511; // Scale to percentage
-		//ThrottlePercentageData = 46;
-		//MTemp2[3] = ThrottlePercentageData;
 		
-		//MTemp2[3] = ThrottlePercentageData;
-		//CANMSG = 100000000;
-		//RPMData = CANMSG << 1;
-		BreakData = CANMSG;// << 1;
-		//BreakData = CANMSG;
+		BreakData = CANMSG;
 		
 		PotData = CANMSG;
-		
-		//GearboxTempData = CANMSG << 8;
-		//GearboxTempData += CANMSG;
-		//VoltageData = CANMSG << 8;
-		//VoltageData += CANMSG;
-		
-		// JOhn said NO
-		//radPoint = readDials();
-		//CAN_TXMOB(0, 1, &radPoint, 0x400001,0);
 
 		CAN_RXInit(5,8,0x400000, 0x400000);
 	}
@@ -269,3 +303,43 @@ ISR(CAN_INT_vect)
 	CANPAGE = (4 << 4);
 	CANSTMOB &= ~(1 << RXOK);	//unset the RXOK bit to clear the interrupt.
 }
+
+
+/*
+//	\0
+		
+	for(uint8_t i = 0; i < sizeof Charge; i++){
+		if(Charge[i] == '\0'){
+			Charge[i] = '`';
+			Charge[i+1] = '`';
+			Charge[i+2] = '\0';//0x2302;
+			i = sizeof Charge;
+		}
+	}
+	
+	//ThrottlePercentageData = CANMSG << 8;
+	//ThrottlePercentageData += CANMSG;
+	//ThrottlePercentageData = ThrottlePercentageData * 100 /511; // Scale to percentage
+	//ThrottlePercentageData = 46;
+	//MTemp2[3] = ThrottlePercentageData;
+	
+	//MTemp2[3] = ThrottlePercentageData;
+	//CANMSG = 100000000;
+	//RPMData = CANMSG << 1;
+	
+	
+	//GearboxTempData = CANMSG << 8;
+	//GearboxTempData += CANMSG;
+	//VoltageData = CANMSG << 8;
+	//VoltageData += CANMSG;
+	
+	// JOhn said NO
+	//radPoint = readDials();
+	//CAN_TXMOB(0, 1, &radPoint, 0x400001,0);
+	
+	//BreakData = CANMSG;
+	
+	//memset(PotDataArray, 0, sizeof PotDataArray);
+		
+
+*/

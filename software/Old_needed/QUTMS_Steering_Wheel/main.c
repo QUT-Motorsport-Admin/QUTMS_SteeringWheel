@@ -197,7 +197,7 @@ int main()
 		}
 		
 		if(LeftDialADCScaled == 3)
-		{					
+		{
 			if(ADC_Change == 1)
 			{
 				ADC_Change = 0;
