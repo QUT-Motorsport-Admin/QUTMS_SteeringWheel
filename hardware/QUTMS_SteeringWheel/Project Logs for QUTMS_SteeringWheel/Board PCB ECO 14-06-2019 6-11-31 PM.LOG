@@ -1,0 +1,5 @@
+Change Net Name : Old Net Name=NetLED_1 New Net Name=NetLED5_1
+Added Pin To Net: NetName=NetU1_44 Pin=U1-44
+Added Pin To Net: NetName=NetU1_44 Pin=U5-4
+Added Net: Name=NetU1_44
+Added Member To Class: ClassName=CAN Member=Component U6 MCP2561

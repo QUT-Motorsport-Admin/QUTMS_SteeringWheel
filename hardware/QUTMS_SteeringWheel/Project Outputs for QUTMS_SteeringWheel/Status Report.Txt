@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [QUTMS_SteeringWheel.PrjPcb]
+   Generated File[Board.TXT]
+   Generated File[Board.LDP]
+   Generated File[Board.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 7:39:35 PM On 14/06/2019
