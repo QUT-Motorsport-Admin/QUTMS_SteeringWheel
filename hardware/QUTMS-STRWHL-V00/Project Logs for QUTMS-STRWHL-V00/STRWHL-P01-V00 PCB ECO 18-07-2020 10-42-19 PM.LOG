@@ -1,0 +1,4 @@
+Change Component Footprint: Designator=J2 Old Footprint=Jumper_2Way_Pin New Footprint=Jumper_2Way_Solderable
+Change Component Footprint: Designator=J3 Old Footprint=Jumper_2Way_Pin New Footprint=Jumper_2Way_Solderable
+Change Component Comment : Designator=J2 Old Comment=CAN DEBUG LEDS New Comment=Jumper 2Way Solderable
+Change Component Comment : Designator=J3 Old Comment=Jumper 2Way Pins New Comment=Jumper 2Way Solderable

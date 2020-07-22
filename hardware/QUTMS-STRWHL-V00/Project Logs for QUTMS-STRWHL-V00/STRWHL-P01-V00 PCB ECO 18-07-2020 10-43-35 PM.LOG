@@ -1,0 +1,9 @@
+Removed Pin From Net: NetName=USART1 TX Pin=P1-1
+Removed Pin From Net: NetName=USART1 RX Pin=P1-2
+Removed Pin From Net: NetName=GND Pin=P1-3
+Removed Member From Class: ClassName=STRWHL-S02-V00-Microcontroller Member=P1
+Added Component: Designator=J10(JST_XH254_3P_TH)
+Added Pin To Net: NetName=USART1 TX Pin=J10-1
+Added Pin To Net: NetName=USART1 RX Pin=J10-2
+Added Pin To Net: NetName=GND Pin=J10-3
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component J10 XH2.54 3P

@@ -1,0 +1,22 @@
+Removed Pin From Net: NetName=BTN2 Pin=U1-14
+Removed Pin From Net: NetName=BTN8 Pin=U1-15
+Added Component: Designator=TP1(TestPointSMD)
+Added Component: Designator=TP2(TestPointSMD)
+Added Component: Designator=TP3(TestPointSMD)
+Added Component: Designator=TP4(TestPointSMD)
+Added Component: Designator=TP5(TestPointSMD)
+Added Component: Designator=TP6(TestPointSMD)
+Added Pin To Net: NetName=3V3 Pin=TP1-1
+Added Pin To Net: NetName=PWR SW Pin=TP2-1
+Added Pin To Net: NetName=PWR FB Pin=TP3-1
+Added Pin To Net: NetName=3V3 LED Pin=TP4-1
+Added Pin To Net: NetName=PWR SW LED Pin=TP5-1
+Added Pin To Net: NetName=PWR FB LED Pin=TP6-1
+Added Pin To Net: NetName=BTN8 Pin=U1-14
+Added Pin To Net: NetName=BTN2 Pin=U1-15
+Added Member To Class: ClassName=STRWHL-S04-V00-PSU Member=Component TP1 TestPoint_SMD
+Added Member To Class: ClassName=STRWHL-S04-V00-PSU Member=Component TP2 TestPoint_SMD
+Added Member To Class: ClassName=STRWHL-S04-V00-PSU Member=Component TP3 TestPoint_SMD
+Added Member To Class: ClassName=STRWHL-S04-V00-PSU-LEDs Member=Component TP4 TestPoint_SMD
+Added Member To Class: ClassName=STRWHL-S04-V00-PSU-LEDs Member=Component TP5 TestPoint_SMD
+Added Member To Class: ClassName=STRWHL-S04-V00-PSU-LEDs Member=Component TP6 TestPoint_SMD

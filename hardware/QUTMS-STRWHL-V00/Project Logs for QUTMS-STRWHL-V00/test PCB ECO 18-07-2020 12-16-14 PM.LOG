@@ -1,0 +1,79 @@
+Removed Pin From Net: NetName=GND Pin=J1-1
+Removed Member From Class: ClassName=STRWHL-S06-V00-Connectors Member=J1
+Added Component: Designator=J?(Microfit_2X2_R_SMD)
+Added Pin To Net: NetName=GND Pin=J?-1
+Added Pin To Net: NetName=CAN RX Pin=U2-44
+Added Pin To Net: NetName=CAN TX Pin=U4-2
+Change Net Name : Old Net Name=NetLCD1_21 New Net Name=SCREEN RESET R
+Change Net Name : Old Net Name=NetLCD1_22 New Net Name=SCREEN TE R
+Change Net Name : Old Net Name=NetLCD1_23 New Net Name=SCREEN CS R
+Change Net Name : Old Net Name=NetLCD1_24 New Net Name=SPI1 CLK R
+Change Net Name : Old Net Name=NetLCD1_25 New Net Name=SCREEN D/C R
+Change Net Name : Old Net Name=NetLCD1_27 New Net Name=SPI1 MOSI R
+Change Net Name : Old Net Name=NetLCD1_28 New Net Name=SPI1 MISO R
+Change Net Name : Old Net Name=NetLCD1_29 New Net Name=SCREEN BKLIGH R
+Change Net Name : Old Net Name=NetLCD1_30 New Net Name=RTP CS R
+Change Net Name : Old Net Name=NetLCD1_31 New Net Name=RTP INT R
+Change Net Name : Old Net Name=NetLCD1_32 New Net Name=SPI2 MISO R
+Change Net Name : Old Net Name=NetLCD1_33 New Net Name=SPI2 CLK R
+Change Net Name : Old Net Name=NetLCD1_34 New Net Name=SPI2 MOSI R
+Change Net Name : Old Net Name=NetLCD1_35 New Net Name=SD CS R
+Change Net Name : Old Net Name=NetLCD1_36 New Net Name=FONT CS R
+Change Net Name : Old Net Name=NetLCD1_37 New Net Name=FLASH CS R
+Change Net Name : Old Net Name=NetLCD1_38 New Net Name=FLASH WP R
+Change Net Name : Old Net Name=NetLCD1_39 New Net Name=CTP INT R
+Added Pin To Net: NetName=12V Pin=J?-3
+Added Net: Name=12V
+Added Pin To Net: NetName=CTP INT Pin=R14-2
+Added Pin To Net: NetName=CTP INT Pin=U2-30
+Added Net: Name=CTP INT
+Added Pin To Net: NetName=FLASH CS Pin=R17-2
+Added Pin To Net: NetName=FLASH CS Pin=U2-39
+Added Net: Name=FLASH CS
+Added Pin To Net: NetName=FLASH WP Pin=R19-2
+Added Pin To Net: NetName=FLASH WP Pin=U2-40
+Added Net: Name=FLASH WP
+Added Pin To Net: NetName=FONT CS Pin=R16-2
+Added Pin To Net: NetName=FONT CS Pin=U2-38
+Added Net: Name=FONT CS
+Added Pin To Net: NetName=RTP CS Pin=R12-2
+Added Net: Name=RTP CS
+Added Pin To Net: NetName=RTP INT Pin=R13-2
+Added Net: Name=RTP INT
+Added Pin To Net: NetName=SCREEN BKLIGHT Pin=R3-2
+Added Pin To Net: NetName=SCREEN BKLIGHT Pin=U2-29
+Added Net: Name=SCREEN BKLIGHT
+Added Pin To Net: NetName=SCREEN CS Pin=R7-2
+Added Net: Name=SCREEN CS
+Added Pin To Net: NetName=SCREEN D/C Pin=R8-2
+Added Net: Name=SCREEN D/C
+Added Pin To Net: NetName=SCREEN RESET Pin=R1-2
+Added Net: Name=SCREEN RESET
+Added Pin To Net: NetName=SCREEN TE Pin=R2-2
+Added Net: Name=SCREEN TE
+Added Pin To Net: NetName=SD CS Pin=R15-2
+Added Pin To Net: NetName=SD CS Pin=U2-37
+Added Net: Name=SD CS
+Added Pin To Net: NetName=SPI1 CLK Pin=R4-2
+Added Pin To Net: NetName=SPI1 CLK Pin=U2-20
+Added Net: Name=SPI1 CLK
+Added Pin To Net: NetName=SPI1 MISO Pin=R6-2
+Added Pin To Net: NetName=SPI1 MISO Pin=U2-21
+Added Net: Name=SPI1 MISO
+Added Pin To Net: NetName=SPI1 MOSI Pin=R5-2
+Added Pin To Net: NetName=SPI1 MOSI Pin=U2-22
+Added Net: Name=SPI1 MOSI
+Added Pin To Net: NetName=SPI2 CLK Pin=R9-2
+Added Pin To Net: NetName=SPI2 CLK Pin=U2-34
+Added Net: Name=SPI2 CLK
+Added Pin To Net: NetName=SPI2 MISO Pin=R10-2
+Added Pin To Net: NetName=SPI2 MISO Pin=U2-35
+Added Net: Name=SPI2 MISO
+Added Pin To Net: NetName=SPI2 MOSI Pin=R11-2
+Added Pin To Net: NetName=SPI2 MOSI Pin=U2-36
+Added Net: Name=SPI2 MOSI
+Change Class Name : Old Net Name=STRWHL-S06-V00-Connectors New Net Name=STRWHL-S06-V00-Interface
+Added Class: Name=STRWHL-S01-V00-SteeringWheel
+Added Room: Name=STRWHL-S01-V00-SteeringWheel
+Added Room: Name=STRWHL-S05-V00-Screen
+Added Room: Name=STRWHL-S06-V00-Interface

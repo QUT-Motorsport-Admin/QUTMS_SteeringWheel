@@ -1,0 +1,10 @@
+Removed Pin From Net: NetName=SPI1_SS Pin=U1-17
+Removed Pin From Net: NetName=SPI1 CLK Pin=U1-20
+Removed Pin From Net: NetName=SPI1 MISO Pin=U1-21
+Removed Pin From Net: NetName=SPI1 MOSI Pin=U1-22
+Removed Pin From Net: NetName=BTN1 Pin=U1-23
+Added Pin To Net: NetName=BTN1 Pin=U1-17
+Added Pin To Net: NetName=SPI1_SS Pin=U1-20
+Added Pin To Net: NetName=SPI1 CLK Pin=U1-21
+Added Pin To Net: NetName=SPI1 MISO Pin=U1-22
+Added Pin To Net: NetName=SPI1 MOSI Pin=U1-23

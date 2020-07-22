@@ -1,0 +1,41 @@
+Change Net Name : Old Net Name=NetC9_2 New Net Name=VDDA
+Change Net Name : Old Net Name=NetDS3_1 New Net Name=3V3 L
+Change Net Name : Old Net Name=NetDS4_1 New Net Name=3V3 LED L
+Added Pin To Net: NetName=SCREEN DB0 Pin=LCD1-3
+Added Net: Name=SCREEN DB0
+Added Pin To Net: NetName=SCREEN DB1 Pin=LCD1-4
+Added Net: Name=SCREEN DB1
+Added Pin To Net: NetName=SCREEN DB2 Pin=LCD1-5
+Added Net: Name=SCREEN DB2
+Added Pin To Net: NetName=SCREEN DB3 Pin=LCD1-6
+Added Net: Name=SCREEN DB3
+Added Pin To Net: NetName=SCREEN DB4 Pin=LCD1-7
+Added Net: Name=SCREEN DB4
+Added Pin To Net: NetName=SCREEN DB5 Pin=LCD1-8
+Added Net: Name=SCREEN DB5
+Added Pin To Net: NetName=SCREEN DB6 Pin=LCD1-9
+Added Net: Name=SCREEN DB6
+Added Pin To Net: NetName=SCREEN DB7 Pin=LCD1-10
+Added Net: Name=SCREEN DB7
+Added Pin To Net: NetName=SCREEN DB8 Pin=LCD1-11
+Added Net: Name=SCREEN DB8
+Added Pin To Net: NetName=SCREEN DB9 Pin=LCD1-12
+Added Net: Name=SCREEN DB9
+Added Pin To Net: NetName=SCREEN DB10 Pin=LCD1-13
+Added Net: Name=SCREEN DB10
+Added Pin To Net: NetName=SCREEN DB11 Pin=LCD1-14
+Added Net: Name=SCREEN DB11
+Added Pin To Net: NetName=SCREEN DB12 Pin=LCD1-15
+Added Net: Name=SCREEN DB12
+Added Pin To Net: NetName=SCREEN DB13 Pin=LCD1-16
+Added Net: Name=SCREEN DB13
+Added Pin To Net: NetName=SCREEN DB14 Pin=LCD1-17
+Added Net: Name=SCREEN DB14
+Added Pin To Net: NetName=SCREEN DB15 Pin=LCD1-18
+Added Net: Name=SCREEN DB15
+Added Pin To Net: NetName=SCREEN DB16 Pin=LCD1-19
+Added Net: Name=SCREEN DB16
+Added Pin To Net: NetName=SCREEN DB17 Pin=LCD1-20
+Added Net: Name=SCREEN DB17
+Added Pin To Net: NetName=SCREEN PRL RD Pin=LCD1-26
+Added Net: Name=SCREEN PRL RD

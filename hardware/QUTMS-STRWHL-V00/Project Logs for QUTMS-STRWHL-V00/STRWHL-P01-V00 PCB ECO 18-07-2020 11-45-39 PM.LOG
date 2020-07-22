@@ -1,0 +1,29 @@
+Change Component Description : Designator=U1 Old Description=ARM® Cortex®-M4 STM32F3 Microcontroller IC 32-Bit 72MHz 256KB (256K x 8) FLASH 64-LQFP (10x10) New Description= ARM® Cortex®-M4 STM32F3 Microcontroller IC 32-Bit 72MHz 256KB (256K x 8) FLASH 64-LQFP (10x10)
+Added Component: Designator=DS5(LED ORANGE 0603)
+Added Component: Designator=DS6(LED ORANGE 0603)
+Added Component: Designator=J11(Jumper_2Way_Solderable)
+Added Component: Designator=J12(Jumper_2Way_Solderable)
+Added Component: Designator=R37(Res_ThinFilm_0603)
+Added Component: Designator=R38(Res_ThinFilm_0603)
+Added Pin To Net: NetName=GND Pin=DS5-2
+Added Pin To Net: NetName=GND Pin=DS6-2
+Added Pin To Net: NetName=NEO A Pin=J11-1
+Added Pin To Net: NetName=NEO B Pin=J12-1
+Added Pin To Net: NetName=NetDS5_1 Pin=DS5-1
+Added Pin To Net: NetName=NetDS5_1 Pin=R37-2
+Added Net: Name=NetDS5_1
+Added Pin To Net: NetName=NetDS6_1 Pin=DS6-1
+Added Pin To Net: NetName=NetDS6_1 Pin=R38-2
+Added Net: Name=NetDS6_1
+Added Pin To Net: NetName=NetJ11_2 Pin=J11-2
+Added Pin To Net: NetName=NetJ11_2 Pin=R37-1
+Added Net: Name=NetJ11_2
+Added Pin To Net: NetName=NetJ12_2 Pin=J12-2
+Added Pin To Net: NetName=NetJ12_2 Pin=R38-1
+Added Net: Name=NetJ12_2
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component DS5 LED Orange 0603
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component DS6 LED Orange 0603
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component J11 Jumper 2Way Solderable
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component J12 Jumper 2Way Solderable
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component R37 330R
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component R38 330R

@@ -1,0 +1,89 @@
+Removed Pin From Net: NetName=USART1 TX Pin=J10-1
+Removed Pin From Net: NetName=USART1 RX Pin=J10-2
+Removed Pin From Net: NetName=NEO A Pin=J11-1
+Removed Pin From Net: NetName=NEO A Pin=J11-1
+Removed Pin From Net: NetName=NEO A Pin=J11-1
+Removed Pin From Net: NetName=NEO B Pin=J12-1
+Removed Pin From Net: NetName=NEO B Pin=J12-1
+Removed Pin From Net: NetName=NEO B Pin=J12-1
+Removed Pin From Net: NetName=NRST Pin=R1-1
+Removed Pin From Net: NetName=3V3 Pin=R1-2
+Removed Pin From Net: NetName=NetDS5_1 Pin=R37-2
+Removed Pin From Net: NetName=NetDS6_1 Pin=R38-2
+Removed Pin From Net: NetName=BTN3 Pin=U1-8
+Removed Pin From Net: NetName=BTN4 Pin=U1-9
+Removed Pin From Net: NetName=BTN5 Pin=U1-10
+Removed Pin From Net: NetName=BTN6 Pin=U1-11
+Removed Pin From Net: NetName=ENC TOP1 Pin=U1-14
+Removed Pin From Net: NetName=ENC TOP2 Pin=U1-15
+Removed Pin From Net: NetName=ENC TOP3 Pin=U1-16
+Removed Pin From Net: NetName=NEO B Pin=U1-18
+Removed Pin From Net: NetName=ENC TOP4 Pin=U1-23
+Removed Pin From Net: NetName=BTN7 Pin=U1-24
+Removed Pin From Net: NetName=BTN8 Pin=U1-25
+Removed Pin From Net: NetName=USART1 TX Pin=U1-26
+Removed Pin From Net: NetName=USART1 RX Pin=U1-27
+Removed Pin From Net: NetName=ENC BTM4 Pin=U1-28
+Removed Pin From Net: NetName=SCREEN BKLIGHT Pin=U1-29
+Removed Pin From Net: NetName=CTP INT Pin=U1-30
+Removed Pin From Net: NetName=ENC BTM1 Pin=U1-42
+Removed Pin From Net: NetName=ENC BTM2 Pin=U1-43
+Removed Pin From Net: NetName=ENC BTM3 Pin=U1-50
+Removed Pin From Net: NetName=BTN9 Pin=U1-53
+Removed Pin From Net: NetName=NEO A Pin=U1-54
+Removed Pin From Net: NetName=BTN1 Pin=U1-56
+Removed Pin From Net: NetName=BTN2 Pin=U1-57
+Removed Pin From Net: NetName=SCREEN RESET Pin=U1-61
+Removed Pin From Net: NetName=SCREEN TE Pin=U1-62
+Removed Member From Class: ClassName=STRWHL-S02-V00-Microcontroller Member=J11
+Removed Member From Class: ClassName=STRWHL-S02-V00-Microcontroller Member=J12
+Change Component Comment : Designator=R1 Old Comment=4k7 New Comment=10k
+Change Component Comment : Designator=R38 Old Comment=330R New Comment=4k7
+Change Component Comment : Designator=R37 Old Comment=330R New Comment=10k
+Added Component: Designator=R39(Res_ThinFilm_0603)
+Added Component: Designator=R40(Res_ThinFilm_0603)
+Added Pin To Net: NetName=USART1 TX Pin=R1-1
+Added Pin To Net: NetName=USART1 RX Pin=R37-1
+Added Pin To Net: NetName=NRST Pin=R38-1
+Added Pin To Net: NetName=3V3 Pin=R38-2
+Added Pin To Net: NetName=NetDS5_1 Pin=R39-2
+Added Pin To Net: NetName=NetDS6_1 Pin=R40-2
+Added Pin To Net: NetName=SCREEN RESET Pin=U1-8
+Added Pin To Net: NetName=SCREEN TE Pin=U1-9
+Added Pin To Net: NetName=SCREEN BKLIGHT Pin=U1-10
+Added Pin To Net: NetName=BTN9 Pin=U1-11
+Added Pin To Net: NetName=BTN1 Pin=U1-14
+Added Pin To Net: NetName=BTN2 Pin=U1-15
+Added Pin To Net: NetName=BTN3 Pin=U1-16
+Added Pin To Net: NetName=BTN4 Pin=U1-23
+Added Pin To Net: NetName=USART1 TX Pin=U1-24
+Added Pin To Net: NetName=USART1 RX Pin=U1-25
+Added Pin To Net: NetName=ENC TOP4 Pin=U1-26
+Added Pin To Net: NetName=ENC BTM4 Pin=U1-27
+Added Pin To Net: NetName=BTN8 Pin=U1-28
+Added Pin To Net: NetName=ENC TOP2 Pin=U1-29
+Added Pin To Net: NetName=ENC BTM2 Pin=U1-30
+Added Pin To Net: NetName=BTN5 Pin=U1-41
+Added Pin To Net: NetName=BTN6 Pin=U1-42
+Added Pin To Net: NetName=BTN7 Pin=U1-43
+Added Pin To Net: NetName=ENC TOP1 Pin=U1-50
+Added Pin To Net: NetName=CTP INT Pin=U1-53
+Added Pin To Net: NetName=ENC BTM1 Pin=U1-55
+Added Pin To Net: NetName=ENC TOP3 Pin=U1-56
+Added Pin To Net: NetName=ENC BTM3 Pin=U1-57
+Added Pin To Net: NetName=NEO A Pin=U1-61
+Added Pin To Net: NetName=NEO B Pin=U1-62
+Added Pin To Net: NetName=NetR39_1 Pin=R39-1
+Added Pin To Net: NetName=NetR39_1 Pin=U1-54
+Added Net: Name=NetR39_1
+Added Pin To Net: NetName=NetR40_1 Pin=R40-1
+Added Pin To Net: NetName=NetR40_1 Pin=U1-18
+Added Net: Name=NetR40_1
+Added Pin To Net: NetName=USART1 RX R Pin=J10-2
+Added Pin To Net: NetName=USART1 RX R Pin=R37-2
+Added Net: Name=USART1 RX R
+Added Pin To Net: NetName=USART1 TX R Pin=J10-1
+Added Pin To Net: NetName=USART1 TX R Pin=R1-2
+Added Net: Name=USART1 TX R
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component R39 330R
+Added Member To Class: ClassName=STRWHL-S02-V00-Microcontroller Member=Component R40 330R

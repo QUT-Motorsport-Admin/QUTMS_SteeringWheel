@@ -1,0 +1,6 @@
+Change Component Footprint: Designator=R2 Old Footprint=RESC1608X55X25ML10T15 New Footprint=Res_ThinFilm_0603
+Change Component Footprint: Designator=R3 Old Footprint=RESC1608X55X25ML10T15 New Footprint=Res_ThinFilm_0603
+Change Managed Component Library Link : Designator=R2 Old VaultGUID=B7D15EC3-160A-466F-A46C-7801FE6295A7 New VaultGUID= Old ItemGUID=B6902497-BEA6-484F-BE22-45C4878B1948 New ItemGUID= Old RevisionGUID=8D512E21-7801-4654-BBBE-2E99AEAFEE57 New RevisionGUID=
+Change Managed Component Library Link : Designator=R3 Old VaultGUID=B7D15EC3-160A-466F-A46C-7801FE6295A7 New VaultGUID= Old ItemGUID=B6902497-BEA6-484F-BE22-45C4878B1948 New ItemGUID= Old RevisionGUID=8D512E21-7801-4654-BBBE-2E99AEAFEE57 New RevisionGUID=
+Change component parameters: Designator = "R2" ("R2"); Footprint = "RESC1608X55X25ML10T15"; UniqueID = "\KXCBVWAI\HZFYRESB" ("\KXCBVWAI\HZFYRESB")
+Change component parameters: Designator = "R3" ("R3"); Footprint = "RESC1608X55X25ML10T15"; UniqueID = "\KXCBVWAI\IIAMHNGI" ("\KXCBVWAI\IIAMHNGI")

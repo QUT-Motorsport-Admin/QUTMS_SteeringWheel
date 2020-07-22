@@ -1,0 +1,20 @@
+Output: Gerber Files
+Type  : Gerber
+From  : Variant [[No Variations]] of Project [QUTMS-STRWHL-V00.PrjPcb]
+   Generated File[STRWHL-P01-V00.GTO]
+   Generated File[STRWHL-P01-V00.GTS]
+   Generated File[STRWHL-P01-V00.GTL]
+   Generated File[STRWHL-P01-V00.GBL]
+   Generated File[STRWHL-P01-V00.GBS]
+   Generated File[STRWHL-P01-V00.GBO]
+   Generated File[STRWHL-P01-V00.GM1]
+   Generated File[STRWHL-P01-V00.GKO]
+   Generated File[STRWHL-P01-V00.RUL]
+   Generated File[STRWHL-P01-V00.EXTREP]
+   Generated File[STRWHL-P01-V00.REP]
+
+
+Files Generated   : 11
+Documents Printed : 0
+
+Finished Output Generation At 11:01:34 PM On 19/07/2020

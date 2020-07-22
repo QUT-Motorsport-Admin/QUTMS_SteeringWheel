@@ -1,0 +1,8 @@
+Removed Pin From Net: NetName=ENC TOP1 Pin=U1-26
+Removed Pin From Net: NetName=ENC BTM1 Pin=U1-27
+Removed Pin From Net: NetName=ENC TOP3 Pin=U1-29
+Removed Pin From Net: NetName=ENC BTM3 Pin=U1-30
+Added Pin To Net: NetName=ENC BTM1 Pin=U1-26
+Added Pin To Net: NetName=ENC TOP1 Pin=U1-27
+Added Pin To Net: NetName=ENC BTM3 Pin=U1-29
+Added Pin To Net: NetName=ENC TOP3 Pin=U1-30

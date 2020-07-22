@@ -1,0 +1,45 @@
+Change Component Description : Designator=U1 Old Description=ARM® Cortex®-M4 STM32F3 Microcontroller IC 32-Bit 72MHz 256KB (256K x 8) FLASH 64-LQFP (10x10) New Description= ARM® Cortex®-M4 STM32F3 Microcontroller IC 32-Bit 72MHz 256KB (256K x 8) FLASH 64-LQFP (10x10)
+Added Component: Designator=M1(M3.2 PLATED)
+Added Component: Designator=M2(M3.2 PLATED)
+Added Component: Designator=M3(M3.2 PLATED)
+Added Component: Designator=M4(M3.2 PLATED)
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M1-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M2-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M3-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Pin To Net: NetName=GND Pin=M4-1
+Added Member To Class: ClassName=STRWHL-S01-V00-SteeringWheel Member=Component M1 Hole M3 Tight Plated
+Added Member To Class: ClassName=STRWHL-S01-V00-SteeringWheel Member=Component M2 Hole M3 Tight Plated
+Added Member To Class: ClassName=STRWHL-S01-V00-SteeringWheel Member=Component M3 Hole M3 Tight Plated
+Added Member To Class: ClassName=STRWHL-S01-V00-SteeringWheel Member=Component M4 Hole M3 Tight Plated

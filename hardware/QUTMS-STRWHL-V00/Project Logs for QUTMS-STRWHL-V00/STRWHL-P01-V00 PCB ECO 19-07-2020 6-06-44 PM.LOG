@@ -1,0 +1,9 @@
+Removed Pin From Net: NetName=BTN1 Pin=U1-14
+Removed Pin From Net: NetName=BTN3 Pin=U1-16
+Removed Pin From Net: NetName=BTN4 Pin=U1-23
+Removed Pin From Net: NetName=BTN8 Pin=U1-28
+Change Component Description : Designator=U1 Old Description= ARM® Cortex®-M4 STM32F3 Microcontroller IC 32-Bit 72MHz 256KB (256K x 8) FLASH 64-LQFP (10x10) New Description=ARM® Cortex®-M4 STM32F3 Microcontroller IC 32-Bit 72MHz 256KB (256K x 8) FLASH 64-LQFP (10x10)
+Added Pin To Net: NetName=BTN4 Pin=U1-14
+Added Pin To Net: NetName=BTN8 Pin=U1-16
+Added Pin To Net: NetName=BTN1 Pin=U1-23
+Added Pin To Net: NetName=BTN3 Pin=U1-28
