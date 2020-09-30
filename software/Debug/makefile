@@ -48,8 +48,8 @@ QUTMS_SteeringWheel.bin \
 all: QUTMS_SteeringWheel.elf secondary-outputs
 
 # Tool invocations
-QUTMS_SteeringWheel.elf: $(OBJS) $(USER_OBJS) C:\Users\Motorsports\Desktop\git\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld
-	arm-none-eabi-gcc -o "QUTMS_SteeringWheel.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Motorsports\Desktop\git\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="QUTMS_SteeringWheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+QUTMS_SteeringWheel.elf: $(OBJS) $(USER_OBJS) C:\Users\J_Hos\OneDrive\Documents\QUT\ Motorsport\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld
+	arm-none-eabi-gcc -o "QUTMS_SteeringWheel.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\J_Hos\OneDrive\Documents\QUT Motorsport\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="QUTMS_SteeringWheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

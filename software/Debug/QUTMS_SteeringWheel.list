@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  16 .debug_line   0000c884  00000000  00000000  0004c51f  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_str    0009278c  00000000  00000000  00058da3  2**0
+ 17 .debug_str    0009279c  00000000  00000000  00058da3  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .comment      0000007b  00000000  00000000  000eb52f  2**0
+ 18 .comment      0000007b  00000000  00000000  000eb53f  2**0
                   CONTENTS, READONLY
- 19 .debug_ranges 00000bc8  00000000  00000000  000eb5b0  2**3
+ 19 .debug_ranges 00000bc8  00000000  00000000  000eb5c0  2**3
                   CONTENTS, READONLY, DEBUGGING
- 20 .debug_frame  00003774  00000000  00000000  000ec178  2**2
+ 20 .debug_frame  00003774  00000000  00000000  000ec188  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -4231,7 +4231,7 @@ int main(void)
 	BSP_LCD_SetFont(&Font24);
  8001bea:	4815      	ldr	r0, [pc, #84]	; (8001c40 <main+0x100>)
  8001bec:	f7ff fad4 	bl	8001198 <BSP_LCD_SetFont>
-	BSP_LCD_DisplayStringAt(20,20, "test", CENTER_MODE);
+	BSP_LCD_DisplayStringAt(20,20, "James", CENTER_MODE);
  8001bf0:	2301      	movs	r3, #1
  8001bf2:	4a14      	ldr	r2, [pc, #80]	; (8001c44 <main+0x104>)
  8001bf4:	2114      	movs	r1, #20
@@ -4327,8 +4327,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
  8001c94:	2300      	movs	r3, #0
  8001c96:	66bb      	str	r3, [r7, #104]	; 0x68
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4;
- 8001c98:	f44f 2300 	mov.w	r3, #524288	; 0x80000
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL8;
+ 8001c98:	f44f 13c0 	mov.w	r3, #1572864	; 0x180000
  8001c9c:	66fb      	str	r3, [r7, #108]	; 0x6c
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
  8001c9e:	f107 0348 	add.w	r3, r7, #72	; 0x48
@@ -4350,8 +4350,8 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
  8001cb6:	2302      	movs	r3, #2
  8001cb8:	63bb      	str	r3, [r7, #56]	; 0x38
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
- 8001cba:	2380      	movs	r3, #128	; 0x80
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 8001cba:	2300      	movs	r3, #0
  8001cbc:	63fb      	str	r3, [r7, #60]	; 0x3c
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
  8001cbe:	f44f 6380 	mov.w	r3, #1024	; 0x400
@@ -4360,9 +4360,9 @@ void SystemClock_Config(void)
  8001cc4:	2300      	movs	r3, #0
  8001cc6:	647b      	str	r3, [r7, #68]	; 0x44
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
  8001cc8:	f107 0334 	add.w	r3, r7, #52	; 0x34
- 8001ccc:	2100      	movs	r1, #0
+ 8001ccc:	2101      	movs	r1, #1
  8001cce:	4618      	mov	r0, r3
  8001cd0:	f001 fd50 	bl	8003774 <HAL_RCC_ClockConfig>
  8001cd4:	4603      	mov	r3, r0
