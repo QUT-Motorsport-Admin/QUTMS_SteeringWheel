@@ -2,9 +2,6 @@
 
 # QUT Motorsport - Steering Wheel
 
-## THIS PROJECT HAS BEEN DEPRECATED, FUTURE WORK WILL BE CONDUCTED AT QUTMS_SteeringWheel_V2
-QEV1's Steering Wheel Board, which this repo coresponds to suffered from critical failure when the 5V linear regulator died. This prompted the team to begin work on a new design for QEV2, which can be found at [QUTMS_SteeringWheel_V2](https://github.com/QUT-Motorsport/QUTMS_SteeringWheel_V2).
-
 ### What?
 A 'dumb' output terminal that acts as a digital dashboard for the car.
 ### Why?
@@ -18,7 +15,3 @@ A digital display in the steering wheel of the car that receives and displays in
 
 ## Specific README's
 These will cover any specific features, outlines or documentation that a programmer/designer should know about. Any specifics, or this outside the overview/outline please update an entry in the wiki
-
-[Hardware](https://github.com/Technosasquach/QUTMS_SteeringWheel/tree/master/hardware "Hardware")
-
-[Software](https://github.com/Technosasquach/QUTMS_SteeringWheel/tree/master/software "Software")
