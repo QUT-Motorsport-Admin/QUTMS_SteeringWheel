@@ -27,10 +27,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "Lcd/stm32_adafruit_lcd.h"
-#include "Lcd/lcd.h"
+#include "stm32_adafruit_lcd.h"
+#include "lcd.h"
 #include "QUTMS.h"
 #include "stdbool.h"
+#include "gui.h"
 
 /* USER CODE END Includes */
 
@@ -51,7 +52,22 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+Drive_Mode current_drive_mode = STATIC_MODE;
+Event_Profile current_event;
+uint8_t selected_menu_option;
+uint8_t max_menu_option;
+UI_Screen current_screen = SM_SCREEN;
+float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp =
+		20, motor_temp = 49, accumul_charge = 190, accumul_delta = -0.85;
+uint8_t total_laps = 0, current_lap = 1;
+extern Driver_Profile drivers[4];
+Driver_Profile current_driver = { "Default", 45.8, 3, 100, 76 };
+extern Event_Profile events[4];
+volatile bool activate_btn_pressed = false;
+volatile uint8_t active_btn_state = 0;
+volatile bool back_btn_pressed = false;
+volatile uint8_t back_btn_state = 0;
+uint16_t raw;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,9 +78,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void logo()
-{
-	BSP_LCD_DrawRGB16Image(0, 120, QUTMS.width, QUTMS.height, (uint16_t*)QUTMS.pixel_data);
+void logo() {
+	BSP_LCD_DrawRGB16Image(0, 120, QUTMS.width, QUTMS.height,
+			(uint16_t*) QUTMS.pixel_data);
 }
 /* USER CODE END 0 */
 
@@ -75,7 +91,6 @@ void logo()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	rtd = false;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -102,7 +117,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 	/** Create CAN Filter & Apply it to &CANBUS4, &CANBUS2 */
-	CAN_FilterTypeDef  sFilterConfig;
+	CAN_FilterTypeDef sFilterConfig;
 
 	sFilterConfig.FilterBank = 0;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
@@ -115,18 +130,16 @@ int main(void)
 	sFilterConfig.FilterActivation = ENABLE;
 	sFilterConfig.SlaveStartFilterBank = 14;
 
-	if (HAL_CAN_ConfigFilter(&hcan, &sFilterConfig) != HAL_OK)
-	{
+	if (HAL_CAN_ConfigFilter(&hcan, &sFilterConfig) != HAL_OK) {
 		Error_Handler();
 	}
 
-	if(HAL_CAN_Start(&hcan) != HAL_OK)
-	{
+	if (HAL_CAN_Start(&hcan) != HAL_OK) {
 		Error_Handler();
 	}
 
-	if(HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
-	{
+	if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING)
+			!= HAL_OK) {
 		Error_Handler();
 	}
 
@@ -134,118 +147,101 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	uint8_t LCD_Status = BSP_LCD_Init();
-	//	HAL_Delay(100);
-	BSP_LCD_DisplayOff();
+	BSP_LCD_Init();
 	BSP_LCD_Clear(LCD_COLOR_WHITE);
-	//	logo();
-	BSP_LCD_DisplayOn();
 
-	int i = 0;
-	char* msg[9][3] = {
-			{
-					{" Fear it, run from it "},
-					{"    ROBOTEQ arrives   "},
-					{"     all the same     "}
+	//drawStartupScreen();
+	//HAL_Delay(1000);
 
-			},
-			{
-					{"                      "},
-					{"       Vry Nice       "},
-					{"                      "}
-			},
-			{
-					{"                      "},
-					{"    #RacingForTom     "},
-					{"                      "}
-			},
-			{
-					{"      Jesus Take      "},
-					{"      The Wheel      "},
-					{"      Literally      "}
-			},
-			{
-					{"       Drive it       "},
-					{"       Like You       "},
-					{"       Stole it       "}
-			},
-			{
-					{" Praise be the elders "},
-					{"  Sam of Current and  "},
-					{"    Isaac of Beard    "}
-			},
-			{
-					{"  Imagine not having  "},
-					{"     10PM access      "},
-					{"                      "}
-			},
-			{
-					{"  Don't Mean to Flex  "},
-					{"   But We Have 300    "},
-					{"Followers on LinkedIn "}
-			},
-			{
-					{"                      "},
-					{"     QEV3 - LANDO     "},
-					{"                      "}
-			}
+	// Show first screen
+	drawScreen(current_screen);
+	selected_menu_option = 1;
+	current_driver = drivers[0];
 
-
-	};
-
-	int ctr = 0;
-	rtd = true;
-	BSP_LCD_Clear(LCD_COLOR_BLACK);
-	BSP_LCD_DrawHLine(0, 415, BSP_LCD_GetYSize());
-	BSP_LCD_DrawRect(105, 0, 320, 138);
-
-	BSP_LCD_SetFont(&Font24);
-	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	BSP_LCD_DisplayStringAt(10, 57, "VOLTS", LEFT_MODE);
-	BSP_LCD_DisplayStringAt(10, 57 + 138, "IN. C", LEFT_MODE);
-	BSP_LCD_DisplayStringAt(10, 57 + 138 * 2, "CC", LEFT_MODE);
-	BSP_LCD_DrawRect(105, 137, 320, 138);
-	BSP_LCD_DrawRect(105, 274, 320, 138);
-	BSP_LCD_FillRect(105, 411, 320, 4);
-	while (1)
-	{
+	while (1) {
     /* USER CODE END WHILE */
+		// Update screen
+			    if (current_screen == RTD_SCREEN) {
+			    	// Update screen
+			    	updateRTDScreen();
+			    }
+			    else if (current_screen == SM_SCREEN) {
+			        // Update screen
+			    	updateSMScreen();
 
+			        // Handle navigation
+			        updateMenuScroll();
+
+			        // Handle activate of settings
+			        if (activate_btn_pressed) {
+			            switch (selected_menu_option) {
+			            case 0:
+			                drawScreen(DRIVER_SELECTION_SCREEN);
+			                break;
+			            case 1:
+			                drawScreen(EVENT_SELECTION_SCREEN);
+			                break;
+			            case 2:
+			                drawScreen(CAR_CONFIGURATION_SCREEN);
+			                break;
+			            case 3:
+			                //drawAdvancedScreen();
+			                break;
+			            }
+			        }
+			    }
+			    else if (current_screen == DRIVER_SELECTION_SCREEN) {
+			    	// Update screen
+			    	updateDriverSelectionScreen();
+
+			    	// Handle navigation
+			    	updateMenuScroll();
+
+			        // Handle activate of settings
+			        if (activate_btn_pressed) {
+			            changeDriver(drivers[selected_menu_option]);
+			        }
+
+			        if (back_btn_pressed) {
+			            drawScreen(SM_SCREEN);
+			        }
+			    }
+			    else if (current_screen == EVENT_SELECTION_SCREEN) {
+			    	// Update screen
+			        updateEventSelectionScreen();
+
+			        // Handle navigation
+			        updateMenuScroll();
+
+			        // Handle activate of settings
+			        if (activate_btn_pressed) {
+			            changeEvent(events[selected_menu_option]);
+			        }
+
+			        if (back_btn_pressed) {
+			            drawScreen(SM_SCREEN);
+			        }
+			    }
+			    else if (current_screen == CAR_CONFIGURATION_SCREEN) {
+			    	// Update screen
+			    	//updateCarConfigurationScreen();
+
+			        // Handle navigation
+			        updateMenuScroll();
+
+			        // Handle activate/value change of settings
+
+
+			        if (back_btn_pressed) {
+			            drawScreen(SM_SCREEN);
+			        }
+			    }
+
+			    // Handle back button
+
+			    HAL_Delay(400);
     /* USER CODE BEGIN 3 */
-		if(rtd == false)
-		{
-			BSP_LCD_Scroll(i--, 1, 1);
-			HAL_Delay(12);
-		} else {
-
-			ctr++;
-			BSP_LCD_SetFont(&Font20);
-			BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-			if(ctr % 100000 == 0)
-			{
-				int val = rand() % 9;
-				BSP_LCD_DisplayStringAtLine(21, msg[val][0]);
-				BSP_LCD_DisplayStringAtLine(22, msg[val][1]);
-				BSP_LCD_DisplayStringAtLine(23, msg[val][2]);
-			}
-			if(ctr % 5000 == 0)
-			{
-				char x[10];
-				int len = snprintf(x, 10, "%li", rand() % 120);
-				BSP_LCD_DisplayStringAt(215/2 + 105 - (strlen(x)/2 * 17), 57, x, LEFT_MODE);
-				len = snprintf(x, 10, "%li", rand() % 130);
-				BSP_LCD_DisplayStringAt(215/2 + 105 - (strlen(x)/2 * 17), 57 + 138, x, LEFT_MODE);
-				len = snprintf(x, 10, "%f", ((float)ctr) / 321566.0f);
-				BSP_LCD_DisplayStringAt(215/2 + 105 - (strlen(x)/2 * 17), 57 + 138 * 2, x, LEFT_MODE);
-			}
-		}
-
 	}
-	//		BSP_LCD_Scroll(i--, 1, 1);
-	//		HAL_Delay(12);
-	//	}
   /* USER CODE END 3 */
 }
 

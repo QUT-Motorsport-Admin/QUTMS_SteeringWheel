@@ -821,6 +821,8 @@ void BSP_LCD_DisplayOff(void)
   */
 static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *pChar)
 {
+	 uint8_t *bitmap = calloc(DrawProp.pFont->Height * DrawProp.pFont->Width*2 + OFFSET_BITMAP, sizeof(uint8_t));
+
   uint32_t counterh = 0, counterw = 0, index = 0;
   uint16_t height = 0, width = 0;
   uint8_t offset = 0;
@@ -845,20 +847,12 @@ static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *pChar)
   {
     pchar = ((uint8_t *)pChar + (width + 7)/8 * counterh);
     
-    if(((width + 7)/8) == 3)
-    {
-      line =  (pchar[0]<< 16) | (pchar[1]<< 8) | pchar[2];
+    int bytes = ((width + 7)/8);
+    line = 0;
+    for (int i = 0; i < bytes; i++) {
+        line <<= 8;
+        line |= pchar[i];
     }
-    
-    if(((width + 7)/8) == 2)
-    {
-      line =  (pchar[0]<< 8) | pchar[1];
-    }
-    
-    if(((width + 7)/8) == 1)
-    {
-      line =  pchar[0];
-    }    
     
     for (counterw = 0; counterw < width; counterw++)
     {
@@ -878,6 +872,7 @@ static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *pChar)
     }
   }
   BSP_LCD_DrawBitmap(Xpos, Ypos, bitmap);
+  free(bitmap);
 }
 
 /**

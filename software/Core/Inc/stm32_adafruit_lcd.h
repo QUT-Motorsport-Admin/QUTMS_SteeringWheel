@@ -54,13 +54,13 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "lcd.h"
-#include "Fonts/fonts.h"
+#include "fonts.h"
 
 //-----------------------------------------------------------------------------
 /* Config section (you can change this defines) */
 
 /* LCD default font (Font8 or Font12 or Font16 or Font20 or Font24) */
-#define LCD_DEFAULT_FONT         Font8
+#define LCD_DEFAULT_FONT         Font_RobotoMedium22
 
 /* LCD default colors */
 #define LCD_DEFAULT_BACKCOLOR    LCD_COLOR_BLACK
@@ -79,6 +79,7 @@
 #define LCD_COLOR_MAGENTA       RC(0xF81F)
 #define LCD_COLOR_YELLOW        RC(0xFFE0)
 #define LCD_COLOR_WHITE         RC(0xFFFF)
+#define LCD_COLOR_ORANGE        RC(0xFA20)
   
 //-----------------------------------------------------------------------------
 /* Interface section (no modify) */   
