@@ -13,7 +13,7 @@
 // Dimensions
 #define screen_width 320
 #define screen_margin 14
-#define menu_line_height 63
+#define menu_line_height 58
 #define reading_line_height 47
 
 // Colors

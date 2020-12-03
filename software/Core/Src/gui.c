@@ -181,31 +181,33 @@ void drawSMScreen() {
 	drawHeaderBar(STATIC_MODE);
 
 	// Draw accumulator bars
-	drawAccumulatorDeltaBar(35);
-	drawAccumulatorTotalBar(126);
+	drawAccumulatorDeltaBar(38);
+	drawAccumulatorTotalBar(138);
 
 	// Draw divider bar
 	BSP_LCD_SetTextColor(primary_back_color);
-	BSP_LCD_FillRect(0, 217, screen_width, 31);
+	BSP_LCD_FillRect(0, 240, screen_width, 5);
 
 	// Draw configuration options
-	drawMenuItem(248, menus[0], false);
+	uint16_t startingXPos = 245;
+	drawMenuItem(startingXPos, menus[0], false);
 	for (int i = 1; i < 3; i++) {
-		drawMenuItem(248 + (menu_line_height * i), menus[i], true);
+		drawMenuItem(startingXPos + (menu_line_height * i), menus[i], true);
 	}
-	drawMenuItem(248 + (menu_line_height * 3), menus[3], false);
+	drawMenuItem(startingXPos + (menu_line_height * 3), menus[3], false);
 }
 void updateSMScreen() {
     // Update accumulator bar
-    updateAccumulatorTotalBar(126);
+    updateAccumulatorTotalBar(138);
 
     // Draw configuration options
+    uint16_t startingXPos = 245;
     for (int i = 0; i < 4; i++) {
         if (i == selected_menu_option) {
-            clearArea(0, 248 + (menu_line_height * i) + ((menu_line_height / 2) - 12), screen_width, 24);
-            updateMenuItem(248 + (menu_line_height * i), menus[i], true); // Highlight selected item
+            clearArea(0, startingXPos + (menu_line_height * i) + ((menu_line_height / 2) - 12), screen_width, 24);
+            updateMenuItem(startingXPos + (menu_line_height * i), menus[i], true); // Highlight selected item
         }
-        else updateMenuItem(248 + (menu_line_height * i), menus[i], false);
+        else updateMenuItem(startingXPos + (menu_line_height * i), menus[i], false);
     }
 }
 
@@ -479,7 +481,7 @@ void drawMenuItem(uint16_t y, uint8_t* label, bool draw_borders) {
 	BSP_LCD_SetTextColor(primary_text_color);
 	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
 	BSP_LCD_SetFont(&Font_RobotoMedium26);
-	BSP_LCD_DisplayStringAt(0, y + ((menu_line_height / 2) - 12), label, CENTER_MODE);
+	BSP_LCD_DisplayStringAt(0, y + ((menu_line_height / 2) - 13), label, CENTER_MODE);
 }
 void updateMenuItem(uint16_t y, uint8_t* label, bool selected) {
     // Draw label text
@@ -487,7 +489,7 @@ void updateMenuItem(uint16_t y, uint8_t* label, bool selected) {
     BSP_LCD_SetTextColor(primary_text_color);
     if(selected) BSP_LCD_SetTextColor(selection_color);
     BSP_LCD_SetFont(&Font_RobotoMedium26);
-    BSP_LCD_DisplayStringAt(0, y + ((menu_line_height / 2) - 12), label, CENTER_MODE);
+    BSP_LCD_DisplayStringAt(0, y + ((menu_line_height / 2) - 13), label, CENTER_MODE);
 }
 
 void drawMenuItemWithValue(uint16_t y, uint8_t* label, uint8_t value, bool draw_borders) {
