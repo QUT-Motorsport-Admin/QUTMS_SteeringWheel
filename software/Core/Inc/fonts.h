@@ -73,11 +73,25 @@ typedef struct _tFont
   
 } sFONT;
 
-extern sFONT Font24;
-extern sFONT Font20;
-extern sFONT Font16;
-extern sFONT Font12;
-extern sFONT Font8;
+extern sFONT Font_RobotoBlack24;
+extern sFONT Font_RobotoBlack26;
+extern sFONT Font_RobotoBlack27;
+extern sFONT Font_RobotoBlack28;
+extern sFONT Font_RobotoBlack30;
+extern sFONT Font_RobotoBlack32;
+extern sFONT Font_RobotoBlack34;
+extern sFONT Font_RobotoBlack36;
+
+extern sFONT Font_RobotoMedium22;
+extern sFONT Font_RobotoMedium24;
+extern sFONT Font_RobotoMedium26;
+extern sFONT Font_RobotoMedium28;
+extern sFONT Font_RobotoMedium32;
+extern sFONT Font_RobotoMedium34;
+extern sFONT Font_RobotoMedium36;
+
+extern const uint8_t* lightning_bitmap;
+
 /**
   * @}
   */ 

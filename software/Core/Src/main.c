@@ -26,9 +26,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include "Lcd/stm32_adafruit_lcd.h"
-#include "Lcd/lcd.h"
+#include "gui.h"
+#include "stm32_adafruit_lcd.h"
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -49,7 +49,22 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+Drive_Mode current_drive_mode = STATIC_MODE;
 
+Event_Profile current_event;
+uint8_t selected_menu_option;
+uint8_t max_menu_option;
+UI_Screen current_screen = RTD_SCREEN;
+float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp = 20, motor_temp = 49, accumul_charge =  190, accumul_delta = -0.85;
+uint8_t total_laps = 0, current_lap = 1;
+extern Driver_Profile drivers[4];
+Driver_Profile current_driver = { "Default", 45.8, 3, 100, 76 };
+extern Event_Profile events[4];
+volatile bool activate_btn_pressed = false;
+volatile uint8_t active_btn_state = 0;
+volatile bool back_btn_pressed = false;
+volatile uint8_t back_btn_state = 0;
+uint16_t raw;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,74 +86,121 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
+	// Setup LCD
+	  BSP_LCD_Init();
 
-  /* MCU Configuration--------------------------------------------------------*/
+	  /* USER CODE END 2 */
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	  /* Infinite loop */
+	  /* USER CODE BEGIN WHILE */
 
-  /* USER CODE BEGIN Init */
+	  // Show startup screen
+	  drawStartupScreen();
+	  HAL_Delay(1000);
 
-  /* USER CODE END Init */
+	  // Show first screen
+	  drawScreen(current_screen);
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	  // start can
+	  selected_menu_option = 1;
+	  current_driver = drivers[0];
+	  while (1)
+	  {
+	    /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN SysInit */
+	    /* USER CODE BEGIN 3 */
 
-  /* USER CODE END SysInit */
+	    // TODO Update state off CAN messages
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_CAN_Init();
-  MX_SPI1_Init();
-  MX_SPI2_Init();
-  MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
+	    // Get ADC values
+	    //HAL_ADC_Start(&hadc1);
+	    //HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	    //raw = HAL_ADC_GetValue(&hadc1);
 
-  /* USER CODE END 2 */
+	    // Update screen
+	    if (current_screen == RTD_SCREEN) {
+	    	// Update screen
+	    	updateRTDScreen();
+	    }
+	    else if (current_screen == SM_SCREEN) {
+	        // Update screen
+	    	updateSMScreen();
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-	HAL_Delay(500);
-	uint8_t LCD_Status = BSP_LCD_Init();
-	HAL_Delay(500);
-	uint8_t buffer[30];
-	sprintf(buffer, "Status = %X\r\n", LCD_Status);
-	HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), HAL_MAX_DELAY);
-	HAL_Delay(100);
-	uint8_t LCD_COLOUR =BSP_LCD_GetBackColor();
-	sprintf(buffer, "COLOUR = %X\r\n", LCD_COLOUR);
-	HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), HAL_MAX_DELAY);
-	BSP_LCD_Clear(LCD_COLOR_GREEN);
-	BSP_LCD_SetBackColor(LCD_COLOR_GREEN);
+	        // Handle navigation
+	        updateMenuScroll();
 
-	//BSP_LCD_SetBackColor(RC(0x001F));
-	BSP_LCD_DrawRect(10,10,10,10);
-	BSP_LCD_DrawCircle(10,10,10);
+	        // Handle activate of settings
+	        if (activate_btn_pressed) {
+	            switch (selected_menu_option) {
+	            case 0:
+	                drawScreen(DRIVER_SELECTION_SCREEN);
+	                break;
+	            case 1:
+	                drawScreen(EVENT_SELECTION_SCREEN);
+	                break;
+	            case 2:
+	                drawScreen(CAR_CONFIGURATION_SCREEN);
+	                break;
+	            case 3:
+	                //drawAdvancedScreen();
+	                break;
+	            }
+	        }
+	    }
+	    else if (current_screen == DRIVER_SELECTION_SCREEN) {
+	    	// Update screen
+	    	updateDriverSelectionScreen();
 
-	HAL_Delay(1000);
+	    	// Handle navigation
+	    	updateMenuScroll();
 
-	BSP_LCD_SetFont(&Font24);
-	BSP_LCD_DisplayStringAt(20,20, "James", CENTER_MODE);
-	BSP_LCD_SetFont(&Font16);
-	BSP_LCD_DisplayStringAt(0,70, "test123", LEFT_MODE);
+	        // Handle activate of settings
+	        if (activate_btn_pressed) {
+	            changeDriver(drivers[selected_menu_option]);
+	        }
 
-	while (1)
-	{
-    /* USER CODE END WHILE */
+	        if (back_btn_pressed) {
+	            drawScreen(SM_SCREEN);
+	        }
+	    }
+	    else if (current_screen == EVENT_SELECTION_SCREEN) {
+	    	// Update screen
+	        updateEventSelectionScreen();
 
-    /* USER CODE BEGIN 3 */
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET);
-		HAL_Delay(1000);
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
-		HAL_Delay(1000);
+	        // Handle navigation
+	        updateMenuScroll();
+
+	        // Handle activate of settings
+	        if (activate_btn_pressed) {
+	            changeEvent(events[selected_menu_option]);
+	        }
+
+	        if (back_btn_pressed) {
+	            drawScreen(SM_SCREEN);
+	        }
+	    }
+	    else if (current_screen == CAR_CONFIGURATION_SCREEN) {
+	    	// Update screen
+	    	//updateCarConfigurationScreen();
+
+	        // Handle navigation
+	        updateMenuScroll();
+
+	        // Handle activate/value change of settings
 
 
+	        if (back_btn_pressed) {
+	            drawScreen(SM_SCREEN);
+	        }
+	    }
+
+	    // Handle back button
+
+	    HAL_Delay(400);
+
+	  }
+	  /* USER CODE END 3 */
 	}
-  /* USER CODE END 3 */
-}
 
 /**
   * @brief System Clock Configuration

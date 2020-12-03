@@ -10,7 +10,10 @@ RM := rm -rf
 -include sources.mk
 -include Drivers/STM32F3xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
--include Core/Src/Lcd/Fonts/subdir.mk
+-include Core/Src/Lcd/Fonts/Roboto/Medium/subdir.mk
+-include Core/Src/Lcd/Fonts/Roboto/Black/subdir.mk
+-include Core/Src/Lcd/Fonts/Legacy/subdir.mk
+-include Core/Src/Lcd/Fonts/Icons/subdir.mk
 -include Core/Src/Lcd/subdir.mk
 -include Core/Src/subdir.mk
 -include subdir.mk
@@ -30,6 +33,11 @@ endif
 
 -include ../makefile.defs
 
+BUILD_ARTIFACT_NAME := QUTMS_SteeringWheel
+BUILD_ARTIFACT_EXTENSION := elf
+BUILD_ARTIFACT_PREFIX := 
+BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME).$(BUILD_ARTIFACT_EXTENSION)
+
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
 QUTMS_SteeringWheel.elf \
@@ -45,11 +53,14 @@ QUTMS_SteeringWheel.bin \
 
 
 # All Target
-all: QUTMS_SteeringWheel.elf secondary-outputs
+all: main-build
+
+# Main-build Target
+main-build: QUTMS_SteeringWheel.elf secondary-outputs
 
 # Tool invocations
-QUTMS_SteeringWheel.elf: $(OBJS) $(USER_OBJS) C:\Users\J_Hos\OneDrive\Documents\QUT\ Motorsport\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld
-	arm-none-eabi-gcc -o "QUTMS_SteeringWheel.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\J_Hos\OneDrive\Documents\QUT Motorsport\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="QUTMS_SteeringWheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+QUTMS_SteeringWheel.elf: $(OBJS) $(USER_OBJS) C:\Users\Calcutt\Documents\GitHub\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld
+	arm-none-eabi-gcc -o "QUTMS_SteeringWheel.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Calcutt\Documents\GitHub\QUTMS_SteeringWheel\software\STM32F302RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="QUTMS_SteeringWheel.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -75,7 +86,14 @@ clean:
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
-.PHONY: all clean dependents
+fail-specified-linker-script-missing:
+	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
+	@exit 2
+
+warn-no-linker-script-specified:
+	@echo 'Warning: No linker script specified. Check the linker settings in the build configuration.'
+
+.PHONY: all clean dependents fail-specified-linker-script-missing warn-no-linker-script-specified
 .SECONDARY:
 
 -include ../makefile.targets

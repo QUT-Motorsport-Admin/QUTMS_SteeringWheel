@@ -85,7 +85,7 @@ EndDependencies */
 /* Includes ------------------------------------------------------------------*/
 #include "lcd.h"
 #include "stm32_adafruit_lcd.h"
-#include "Fonts/fonts.h"
+#include "fonts.h"
 
 /* @defgroup STM32_ADAFRUIT_LCD_Private_Defines */
 #define POLY_X(Z)             ((int32_t)((Points + (Z))->X))

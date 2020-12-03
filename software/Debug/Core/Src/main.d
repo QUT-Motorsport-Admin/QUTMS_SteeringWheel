@@ -30,9 +30,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart_ex.h \
  ../Core/Inc/can.h ../Core/Inc/main.h ../Core/Inc/spi.h \
- ../Core/Inc/usart.h ../Core/Inc/gpio.h \
- ../Core/Src/Lcd/stm32_adafruit_lcd.h ../Core/Src/Lcd/lcd.h \
- ../Core/Src/Lcd/Fonts/fonts.h ../Core/Src/Lcd/lcd.h
+ ../Core/Inc/usart.h ../Core/Inc/gpio.h ../Core/Inc/gui.h \
+ ../Core/Inc/car_settings.h ../Core/Inc/fonts.h \
+ ../Core/Inc/stm32_adafruit_lcd.h ../Core/Inc/lcd.h
 
 ../Core/Inc/main.h:
 
@@ -106,10 +106,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Inc/gpio.h:
 
-../Core/Src/Lcd/stm32_adafruit_lcd.h:
+../Core/Inc/gui.h:
 
-../Core/Src/Lcd/lcd.h:
+../Core/Inc/car_settings.h:
 
-../Core/Src/Lcd/Fonts/fonts.h:
+../Core/Inc/fonts.h:
 
-../Core/Src/Lcd/lcd.h:
+../Core/Inc/stm32_adafruit_lcd.h:
+
+../Core/Inc/lcd.h:

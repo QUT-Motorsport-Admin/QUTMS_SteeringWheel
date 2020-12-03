@@ -29,8 +29,7 @@ Core/Src/Lcd/ili9488.o: ../Core/Src/Lcd/ili9488.c ../Core/Inc/main.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_spi_ex.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart_ex.h \
- ../Core/Src/Lcd/lcd.h ../Core/Src/Lcd/ili9488.h \
- ../Core/Src/Lcd/lcd_io_spi.h
+ ../Core/Inc/lcd.h ../Core/Inc/ili9488.h ../Core/Inc/lcd_io_spi.h
 
 ../Core/Inc/main.h:
 
@@ -94,8 +93,8 @@ Core/Src/Lcd/ili9488.o: ../Core/Src/Lcd/ili9488.c ../Core/Inc/main.h \
 
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart_ex.h:
 
-../Core/Src/Lcd/lcd.h:
+../Core/Inc/lcd.h:
 
-../Core/Src/Lcd/ili9488.h:
+../Core/Inc/ili9488.h:
 
-../Core/Src/Lcd/lcd_io_spi.h:
+../Core/Inc/lcd_io_spi.h:
