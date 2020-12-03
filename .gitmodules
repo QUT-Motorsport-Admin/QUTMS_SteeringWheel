@@ -1,0 +1,3 @@
+[submodule "software/core/Common"]
+	path = software/core/Common
+	url = https://github.com/QUT-Motorsport/QUTMS_Embedded_Common

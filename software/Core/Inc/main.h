@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -54,10 +54,12 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+bool rtd;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define SW_1_Pin GPIO_PIN_3
+#define SW_1_GPIO_Port GPIOA
 #define LED_B_Pin GPIO_PIN_4
 #define LED_B_GPIO_Port GPIOF
 #define SCREEN_CS_Pin GPIO_PIN_10

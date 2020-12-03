@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    stm32f3xx_it.c
-  * @brief   Interrupt Service Routines.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    stm32f3xx_it.c
+ * @brief   Interrupt Service Routines.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -56,7 +56,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-
+extern CAN_HandleTypeDef hcan;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -196,6 +196,52 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f3xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles USB low priority or CAN_RX0 interrupts.
+  */
+void USB_LP_CAN_RX0_IRQHandler(void)
+{
+  /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 0 */
+	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0)
+	{
+		CAN_RxHeaderTypeDef header;
+		uint8_t data[8];
+		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0,  &header, data) != HAL_OK);
+		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
+		{
+			rtd = true;
+		}
+	}
+  /* USER CODE END USB_LP_CAN_RX0_IRQn 0 */
+  HAL_CAN_IRQHandler(&hcan);
+  /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 1 */
+
+  /* USER CODE END USB_LP_CAN_RX0_IRQn 1 */
+}
+
+/**
+  * @brief This function handles CAN RX1 interrupt.
+  */
+void CAN_RX1_IRQHandler(void)
+{
+  /* USER CODE BEGIN CAN_RX1_IRQn 0 */
+	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO1) > 0)
+	{
+		CAN_RxHeaderTypeDef header;
+		uint8_t data[8];
+		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO1,  &header, data) != HAL_OK);
+		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
+		{
+			rtd = true;
+		}
+	}
+  /* USER CODE END CAN_RX1_IRQn 0 */
+  HAL_CAN_IRQHandler(&hcan);
+  /* USER CODE BEGIN CAN_RX1_IRQn 1 */
+
+  /* USER CODE END CAN_RX1_IRQn 1 */
+}
 
 /* USER CODE BEGIN 1 */
 

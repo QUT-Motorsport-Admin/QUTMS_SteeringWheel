@@ -131,7 +131,7 @@ uint8_t BSP_LCD_Init(void)
   
   /* Clear the LCD screen */
   #if LCD_INIT_CLEAR == 1
-  BSP_LCD_Clear(LCD_COLOR_MAGENTA);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
   #endif
   
   ret = LCD_OK;

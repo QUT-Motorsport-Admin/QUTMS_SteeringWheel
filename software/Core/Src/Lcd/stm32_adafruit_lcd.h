@@ -67,7 +67,7 @@
 #define LCD_DEFAULT_TEXTCOLOR    LCD_COLOR_WHITE
 
 /* LCD clear with LCD_DEFAULT_BACKCOLOR in the BSP_LCD_Init (0:diasble, 1:enable) */
-#define LCD_INIT_CLEAR           1
+#define LCD_INIT_CLEAR           0
 
 /* some colors */
 #define LCD_COLOR_BLACK         RC(0x0000)

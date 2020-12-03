@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include "Lcd/stm32_adafruit_lcd.h"
 #include "Lcd/lcd.h"
+#include "QUTMS.h"
+#include "stdbool.h"
 
 /* USER CODE END Includes */
 
@@ -60,7 +62,10 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void logo()
+{
+	BSP_LCD_DrawRGB16Image(0, 120, QUTMS.width, QUTMS.height, (uint16_t*)QUTMS.pixel_data);
+}
 /* USER CODE END 0 */
 
 /**
@@ -70,7 +75,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	rtd = false;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -96,103 +101,151 @@ int main(void)
   MX_SPI2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+	/** Create CAN Filter & Apply it to &CANBUS4, &CANBUS2 */
+	CAN_FilterTypeDef  sFilterConfig;
+
+	sFilterConfig.FilterBank = 0;
+	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+	sFilterConfig.FilterIdHigh = 0x0000;
+	sFilterConfig.FilterIdLow = 0x0001;
+	sFilterConfig.FilterMaskIdHigh = 0x0000;
+	sFilterConfig.FilterMaskIdLow = 0x0000;
+	sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+	sFilterConfig.FilterActivation = ENABLE;
+	sFilterConfig.SlaveStartFilterBank = 14;
+
+	if (HAL_CAN_ConfigFilter(&hcan, &sFilterConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
+
+	if(HAL_CAN_Start(&hcan) != HAL_OK)
+	{
+		Error_Handler();
+	}
+
+	if(HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+	{
+		Error_Handler();
+	}
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	HAL_Delay(500);
 	uint8_t LCD_Status = BSP_LCD_Init();
-	HAL_Delay(500);
-	uint8_t buffer[30];
-	sprintf(buffer, "Status = %X\r\n", LCD_Status);
-	HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), HAL_MAX_DELAY);
-	HAL_Delay(100);
-	uint8_t LCD_COLOUR =BSP_LCD_GetBackColor();
-	sprintf(buffer, "COLOUR = %X\r\n", LCD_COLOUR);
-	HAL_UART_Transmit(&huart1, buffer, sizeof(buffer), HAL_MAX_DELAY);
-	BSP_LCD_Clear(LCD_COLOR_BLUE);
-	BSP_LCD_SetBackColor(LCD_COLOR_RED);
+	//	HAL_Delay(100);
+	BSP_LCD_DisplayOff();
+	BSP_LCD_Clear(LCD_COLOR_WHITE);
+	//	logo();
+	BSP_LCD_DisplayOn();
 
-		//VAR Default Sets
-		int LAPCALC = 1;
-		int BATTPERC = 75;
-		int RACECALC = 5;
-		char TRQCODE = '2';
-		char RGNCODE = '50';
-		int DRVMODE = 1;
-		char DRVMODES [3] = {"START", "RACE - DRY", "RACE - WET" };
-		int ERRORCODE = 10;
-		char ERRORCODES[10] = {"CHASSIS CONTROLER ERROR", "PDM ERROR", "BMS ERROR", "AMS ERROR" "INVERTER ERROR",
-				"HV ERROR", "LIMP MODE","INTIALISATION ERROR"  "UNKOWN ERROR", "NOMINAL"};
+	int i = 0;
+	char* msg[9][3] = {
+			{
+					{" Fear it, run from it "},
+					{"    ROBOTEQ arrives   "},
+					{"     all the same     "}
 
-
-
-
-
-		//OUTER BOXES
-		BSP_LCD_DrawRect(60 , 70 , 40 , 220 ); 						//LAP OUTER BOX
-		BSP_LCD_DrawRect(140, 70 , 40 , 220 ); 						//BATT OUTER BOX
-		BSP_LCD_DrawRect(240, 70 , 40 , 220 ); 						//RACE OUTER BOX
-
-		//TEXT
-		BSP_LCD_SetFont(&Font24);
-		BSP_LCD_DisplayStringAt(60 , 40, "LAP" , LEFT_MODE); 		//LAP TEXT
-		BSP_LCD_DisplayStringAt(140, 40, "BATT", LEFT_MODE);		//BATT TEXT
-		BSP_LCD_DisplayStringAt(240, 40, "RACE", LEFT_MODE);		//RACE TEXT
-
-		//AUX
-		BSP_LCD_DrawRect(60 , 180 , 220 , 1 ); 						//MID LINE (ZEROING LINE)
-
-		//VALUE BOXES / BARS
-		BSP_LCD_DrawRect(61 , 180, 38 , LAPCALC ); 													//LAP BATT DELTA CALC (MID BASED)
-		BSP_LCD_DrawRect(141, (220 - (((100 - BATTPERC)/100) * 220)), 38 , (((100 - BATTPERC)/100) * 220));			//BATT PERCENT (BOTTOM BASED) CHECK BATT PERC VALUE (% OR /100 )
-		BSP_LCD_DrawRect(241, 180, 38 , RACECALC);													//RACE BATT DELTA CALC (MID BASED)
-
-		//LOWER SETTINGS BOXES
-		BSP_LCD_DrawRect(60 , 320, 90  , 65);						//TRQ VECT MODE BOX
-		BSP_LCD_DrawRect(180, 320, 90  , 65);						//RGN BRK MODE BOX
-		BSP_LCD_DrawRect(100, 390, 130 , 40);						//DRIVE MODE BOX
-		BSP_LCD_DrawRect(100, 440, 130 , 40);						//ERROR CODE BOX - NOT IN INITIAL DESIGN
-
-		//LOWER SETTINGS HEADER TEXT
-		BSP_LCD_SetFont(&Font16);
-		BSP_LCD_DisplayStringAt(65  ,325,"TRQ VEC", LEFT_MODE);		//TRQ VEC TEXT
-		BSP_LCD_DisplayStringAt(185 ,325,"RGN BRK", LEFT_MODE);		//RGN BRK TEXT
+			},
+			{
+					{"                      "},
+					{"       Vry Nice       "},
+					{"                      "}
+			},
+			{
+					{"                      "},
+					{"    #RacingForTom     "},
+					{"                      "}
+			},
+			{
+					{"      Jesus Take      "},
+					{"      The Wheel      "},
+					{"      Literally      "}
+			},
+			{
+					{"       Drive it       "},
+					{"       Like You       "},
+					{"       Stole it       "}
+			},
+			{
+					{" Praise be the elders "},
+					{"  Sam of Current and  "},
+					{"    Isaac of Beard    "}
+			},
+			{
+					{"  Imagine not having  "},
+					{"     10PM access      "},
+					{"                      "}
+			},
+			{
+					{"  Don't Mean to Flex  "},
+					{"   But We Have 300    "},
+					{"Followers on LinkedIn "}
+			},
+			{
+					{"                      "},
+					{"     QEV3 - LANDO     "},
+					{"                      "}
+			}
 
 
-		//LOWER SETTINGS MODE TEXT
-		BSP_LCD_DisplayStringAt(65 , 350, "TRQCODE", CENTER_MODE); 		//TRQ VEC CODE - REPLACE "TRQCODE" WITH CORRISPONDING VARIABLE
-		BSP_LCD_DisplayStringAt(185, 350, "RGNCODE+%", LEFT_MODE);	//RBN BRK CODE - REPLACE "RGNCODE" WITH CORRISPONDING VARIABLE
-		BSP_LCD_DisplayStringAt(120, 400, DRVMODES[DRVMODE], LEFT_MODE);		//DRV MODE - REPLACE "DRVMODE" WITH CORRISPONDING VARIABLE
-		BSP_LCD_DisplayStringAt(120, 4550, ERRORCODES[ERRORCODE],LEFT_MODE);		//ERROR CODE DISPLAY - REPLACE "ERRORCODE" WITH CORRISPONDING VARIABLE
+	};
 
+	int ctr = 0;
+	rtd = true;
+	BSP_LCD_Clear(LCD_COLOR_BLACK);
+	BSP_LCD_DrawHLine(0, 415, BSP_LCD_GetYSize());
+	BSP_LCD_DrawRect(105, 0, 320, 138);
 
-
- 		//OLD
-	//BSP_LCD_SetBackColor(RC(0x001F));
-	//BSP_LCD_DrawRect(10,10,10,10);
-	//BSP_LCD_DrawCircle(10,10,10);
-
-	//HAL_Delay(1000);
-
-	//BSP_LCD_SetFont(&Font24);
-	//BSP_LCD_DisplayStringAt(20,20, "James", CENTER_MODE);
-	//BSP_LCD_SetFont(&Font16);
-	//BSP_LCD_DisplayStringAt(0,70, "test123", LEFT_MODE);
-
+	BSP_LCD_SetFont(&Font24);
+	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+	BSP_LCD_DisplayStringAt(10, 57, "VOLTS", LEFT_MODE);
+	BSP_LCD_DisplayStringAt(10, 57 + 138, "IN. C", LEFT_MODE);
+	BSP_LCD_DisplayStringAt(10, 57 + 138 * 2, "CC", LEFT_MODE);
+	BSP_LCD_DrawRect(105, 137, 320, 138);
+	BSP_LCD_DrawRect(105, 274, 320, 138);
+	BSP_LCD_FillRect(105, 411, 320, 4);
 	while (1)
 	{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET);
-		HAL_Delay(1000);
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
-		HAL_Delay(1000);
+		if(rtd == false)
+		{
+			BSP_LCD_Scroll(i--, 1, 1);
+			HAL_Delay(12);
+		} else {
 
+			ctr++;
+			BSP_LCD_SetFont(&Font20);
+			BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			if(ctr % 100000 == 0)
+			{
+				int val = rand() % 9;
+				BSP_LCD_DisplayStringAtLine(21, msg[val][0]);
+				BSP_LCD_DisplayStringAtLine(22, msg[val][1]);
+				BSP_LCD_DisplayStringAtLine(23, msg[val][2]);
+			}
+			if(ctr % 5000 == 0)
+			{
+				char x[10];
+				int len = snprintf(x, 10, "%li", rand() % 120);
+				BSP_LCD_DisplayStringAt(215/2 + 105 - (strlen(x)/2 * 17), 57, x, LEFT_MODE);
+				len = snprintf(x, 10, "%li", rand() % 130);
+				BSP_LCD_DisplayStringAt(215/2 + 105 - (strlen(x)/2 * 17), 57 + 138, x, LEFT_MODE);
+				len = snprintf(x, 10, "%f", ((float)ctr) / 321566.0f);
+				BSP_LCD_DisplayStringAt(215/2 + 105 - (strlen(x)/2 * 17), 57 + 138 * 2, x, LEFT_MODE);
+			}
+		}
 
 	}
+	//		BSP_LCD_Scroll(i--, 1, 1);
+	//		HAL_Delay(12);
+	//	}
   /* USER CODE END 3 */
 }
 
