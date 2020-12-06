@@ -10,7 +10,7 @@
 #include "car_settings.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "QUTMS.h"
+#include <math.h>
 
 
 extern Driver_Profile drivers[4];
@@ -23,6 +23,11 @@ extern uint8_t total_laps, current_lap;
 char* menus[4] = { "Driver Select", "Event Select", "Car Config", "Advanced" };
 bool menu_pot_incremented = false;
 bool menu_pot_decremented = false;
+extern UI_Screen current_screen;
+float drawn_accumul_charge = 0;
+float drawn_accumul_delta = 0;
+#define max(x,y) (((x) >= (y)) ? (x) : (y));
+#define min(x,y) (((x) <= (y)) ? (x) : (y));
 
 /* General UI functions */
 void clearArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height){
@@ -45,22 +50,27 @@ void drawScreen(UI_Screen ui_screen) {
     switch (ui_screen) {
         case SM_SCREEN:
             drawSMScreen();
+            current_screen = SM_SCREEN;
 			max_menu_option = 4;
             break;
         case DRIVER_SELECTION_SCREEN:
             drawDriverSelectionScreen();
+            current_screen = DRIVER_SELECTION_SCREEN;
 			max_menu_option = sizeof(drivers) / sizeof(drivers[0]);
             break;
         case EVENT_SELECTION_SCREEN:
             drawEventSelectionScreen();
+            current_screen = EVENT_SELECTION_SCREEN;
 			max_menu_option = sizeof(events) / sizeof(events[0]);
             break;
         case CAR_CONFIGURATION_SCREEN:
             drawCarConfigurationScreen();
+            current_screen = CAR_CONFIGURATION_SCREEN;
 			max_menu_option = 4;
             break;
         default:
             drawRTDScreen();
+            current_screen = RTD_SCREEN;
 			max_menu_option = 0;
             break;
     }
@@ -78,8 +88,7 @@ void updateMenuScroll() {
 void drawStartupScreen() {
     BSP_LCD_SetTextColor(primary_back_color);
     BSP_LCD_SetFont(&Font_RobotoMedium24);
-    BSP_LCD_DrawRGB16Image(0, 120, QUTMS.width, QUTMS.height,
-    			(uint16_t*) QUTMS.pixel_data);
+    BSP_LCD_DisplayStringAt(screen_margin - 10, 24 + ((31 / 2) - 12), "START SCREEN", CENTER_MODE);
 }
 
 void drawRTDScreen() {
@@ -112,7 +121,7 @@ void updateRTDScreen() {
     uint16_t startingYPos = 245;
 
     // Accumul. (v)
-    clearArea(screen_width - 60, startingYPos + (reading_line_height * 0) + ((reading_line_height / 2) - 12), 90, 24);
+    /*clearArea(screen_width - 60, startingYPos + (reading_line_height * 0) + ((reading_line_height / 2) - 12), 90, 24);
     sprintf(reading_value, "%.0f", accumul_volts);
     if (accumul_volts > 50) {
         updateReading(startingYPos + (reading_line_height * 0), reading_value, warning_color);
@@ -174,7 +183,7 @@ void updateRTDScreen() {
 	}
 	else {
 		updateReading(startingYPos + (reading_line_height * 4), reading_value, nominal_color);
-	}
+	}*/
 
 }
 
@@ -321,8 +330,7 @@ void drawHeaderBar(Drive_Mode drive_mode){
 void drawAccumulatorDeltaBar(uint16_t yPos) {
 	uint8_t barHeight = 90;
 	uint16_t barWidth = screen_width - (screen_margin * 2);
-	uint16_t maxDelta = (barWidth / 2) - 2; // -2 is for center line and end border
-	uint16_t currentDelta = abs(maxDelta * accumul_delta);
+	uint16_t maxDelta = (barWidth / 2) - 5; // -2 is for center line and end border
 
 	// Draw outline
 	BSP_LCD_SetTextColor(primary_back_color);
@@ -335,112 +343,161 @@ void drawAccumulatorDeltaBar(uint16_t yPos) {
 	BSP_LCD_DrawLine(screen_margin + (barWidth/2), yPos, screen_margin + (barWidth/2), yPos + barHeight - 1);
 	BSP_LCD_DrawLine(screen_margin + (barWidth/2) + 1, yPos, screen_margin + (barWidth/2) + 1, yPos + barHeight - 1);
 
-
 	// Draw inner fill and percentage text
+	uint16_t target_fill = abs(maxDelta * accumul_delta);
+	uint16_t centerXPos = (screen_margin + (barWidth / 2));
+
 	BSP_LCD_SetFont(&Font_RobotoBlack36);
 	uint8_t displayText[5];
 	sprintf(displayText, "%.2f", accumul_delta);
-	if (accumul_delta < 0) {
-		BSP_LCD_SetTextColor(warning_color);
-		BSP_LCD_FillRect((screen_margin + (barWidth / 2)) - currentDelta - 2, yPos + 2, currentDelta, barHeight - 4);
 
-		BSP_LCD_SetTextColor(primary_text_color);
-		BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-		BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) - 21, displayText, CENTER_MODE);
+	if(accumul_delta > 1 || accumul_delta < -1) return;
+
+	if (accumul_delta < 0) {
+		// Add missing fill
+		uint16_t startingXPos = (centerXPos - 2) - target_fill;
+		BSP_LCD_SetTextColor(warning_color);
+		BSP_LCD_FillRect(startingXPos, yPos + 2, target_fill, barHeight - 4);
 	}
 	else {
+		// Add missing fill
+		uint16_t startingXPos = centerXPos + 2;
 		BSP_LCD_SetTextColor(nominal_color);
-		BSP_LCD_FillRect(screen_margin + (barWidth / 2) + 2, yPos + 2, currentDelta + 1, barHeight - 4);
-
-		BSP_LCD_SetTextColor(primary_text_color);
-		BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-		BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) -  21, displayText, CENTER_MODE);
+		BSP_LCD_FillRect(startingXPos, yPos + 2, target_fill, barHeight - 4);
 	}
 
-	
+	BSP_LCD_SetTextColor(primary_text_color);
+	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+	BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) -  21, displayText, CENTER_MODE);
+
+	drawn_accumul_delta = accumul_delta;
 
 }
 
 void updateAccumulatorDeltaBar(uint16_t yPos) {
 	uint8_t barHeight = 90;
 	uint16_t barWidth = screen_width - (screen_margin * 2);
-	uint16_t maxDelta = (barWidth / 2) - 2; // -2 is for center line and end border
-	uint16_t currentDelta = abs(maxDelta * accumul_delta);
+	uint16_t maxDelta = (barWidth / 2) - 5; // -2 is for center line and end border
 
 	// Draw inner fill and percentage text
-	BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+	uint16_t target_fill = abs(maxDelta * accumul_delta);
+	uint16_t current_fill = abs(drawn_accumul_delta * maxDelta);
+	uint16_t centerXPos = (screen_margin + (barWidth / 2));
+
 	BSP_LCD_SetFont(&Font_RobotoBlack36);
 	uint8_t displayText[5];
 	sprintf(displayText, "%.2f", accumul_delta);
-	if (accumul_delta < 0) {
-		BSP_LCD_SetTextColor(warning_color);
-		BSP_LCD_FillRect((screen_margin + (barWidth / 2)) - currentDelta - 2, yPos + 2, currentDelta, barHeight - 4);
 
-		BSP_LCD_SetTextColor(primary_text_color);
-		BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-		BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) - 21, displayText, CENTER_MODE);
+	if(accumul_delta > 1 || accumul_delta < -1) return;
+
+	// Clear drawn fill if switch from a negative delta to positive, vice versa
+	if(accumul_delta < 0 && drawn_accumul_delta > 0){
+		// Remove excess fill
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+		uint16_t startingXPos = (centerXPos + 2);
+		BSP_LCD_FillRect(startingXPos, yPos + 2, current_fill, barHeight - 4);
+	}
+	if(accumul_delta > 0 && drawn_accumul_delta < 0){
+		// Remove excess fill
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+		uint16_t startingXPos = (centerXPos - 2) - current_fill;
+		BSP_LCD_FillRect(startingXPos, yPos + 2, current_fill, barHeight - 4);
+	}
+
+	if (accumul_delta < 0) {
+		if(target_fill > current_fill){
+			// Add missing fill
+			BSP_LCD_SetTextColor(warning_color);
+			uint16_t startingXPos = (centerXPos - 2) - current_fill - (target_fill - current_fill);
+			BSP_LCD_FillRect(startingXPos, yPos + 2, target_fill - current_fill, barHeight - 4);
+		}
+		else{
+			// Remove excess fill
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+			uint16_t startingXPos = ((centerXPos - current_fill) - 2);
+			BSP_LCD_FillRect(startingXPos, yPos + 2, current_fill - target_fill, barHeight - 4);
+		}
 	}
 	else {
-		BSP_LCD_SetTextColor(nominal_color);
-		BSP_LCD_FillRect(screen_margin + (barWidth / 2) + 2, yPos + 2, currentDelta + 1, barHeight - 4);
-
-		BSP_LCD_SetTextColor(primary_text_color);
-		BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-		BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) -  21, displayText, CENTER_MODE);
+		if(target_fill > current_fill){
+			// Add missing fill
+			BSP_LCD_SetTextColor(nominal_color);
+			uint16_t startingXPos = (centerXPos + current_fill) + 2;
+			BSP_LCD_FillRect(startingXPos, yPos + 2, target_fill - current_fill, barHeight - 4);
+		}
+		else{
+			// Remove excess fill
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+			uint16_t startingXPos = ((centerXPos + current_fill) - (current_fill - target_fill)) + 2;
+			BSP_LCD_FillRect(startingXPos, yPos + 2, current_fill - target_fill, barHeight - 4);
+		}
 	}
+
+	BSP_LCD_SetTextColor(primary_text_color);
+	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+	BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) -  21, displayText, CENTER_MODE);
+
+	drawn_accumul_delta = accumul_delta;
 }
 
 void drawAccumulatorTotalBar(uint16_t yPos) {
-	uint16_t currentCharge = accumul_charge;
 	uint8_t barHeight = 90;
-	uint16_t barWidth = screen_width - (screen_margin * 2);
+	uint16_t barWidth = (screen_width - (screen_margin * 2));
+	uint16_t target_fill_width = (barWidth * accumul_charge) - 5;
 
 	// Draw outline
 	BSP_LCD_SetTextColor(primary_back_color);
 	BSP_LCD_DrawRect(screen_margin, yPos, barWidth, barHeight); // Outer stroke
 	BSP_LCD_DrawRect(screen_margin + 1, yPos + 1, barWidth - 2, barHeight - 2); // Inner stroke
 
-	if(accumul_charge < 0){
-		accumul_charge = 0;
-	}
+	if(accumul_charge < 0 || accumul_charge > 1) return;
 
 	// Draw inner fill
 	BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-	BSP_LCD_FillRect(screen_margin + 2, yPos + 2, currentCharge, barHeight - 4);
+	BSP_LCD_FillRect(screen_margin + 2, yPos + 2, target_fill_width, barHeight - 4);
 
 	// Draw percentage text
 	uint8_t displayText[5];
-	sprintf(displayText, "%.0f", accumul_charge);
+	sprintf(displayText, "%.0f", 100 * accumul_charge);
 
 	BSP_LCD_SetTextColor(primary_text_color);
 	BSP_LCD_SetFont(&Font_RobotoBlack36);
 	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
 	BSP_LCD_DisplayStringAt(0, yPos + (barHeight/2) - 21, displayText, CENTER_MODE);
+
+	drawn_accumul_charge = accumul_charge;
 }
 void updateAccumulatorTotalBar(uint16_t yPos) {
-	uint8_t barHeight = 90;
-	uint16_t barWidth = screen_width - (screen_margin * 2);
+	if(accumul_charge != drawn_accumul_charge){
+		if(accumul_charge < 0 || accumul_charge > 1) return;
+		uint8_t barHeight = 90;
+		uint16_t barWidth = (screen_width - (screen_margin * 2));
+		uint16_t current_fill_width = (barWidth * drawn_accumul_charge) - 5;
+		uint16_t target_fill_width = (barWidth * accumul_charge) - 5;
 
-	// Clear inner fill
-	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_FillRect(screen_margin + 2, yPos + 2, barWidth - 4, barHeight - 4);
+		if(target_fill_width > current_fill_width){
+			// Draw missing fill
+			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+			uint16_t startXPos = (screen_margin + 2) + current_fill_width;
+			BSP_LCD_FillRect(startXPos, yPos + 2, (target_fill_width - current_fill_width), barHeight - 4);
+		}
+		else if(target_fill_width < current_fill_width){
+			// Remove fill difference
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+			uint16_t startXPos = ((screen_margin + 2) + current_fill_width) - (current_fill_width - target_fill_width);
+			BSP_LCD_FillRect(startXPos, yPos + 2, current_fill_width - target_fill_width, barHeight - 4);
+		}
 
-	if(accumul_charge < 0){
-		accumul_charge = 0;
+		// Draw percentage text
+		uint8_t displayText[5];
+		sprintf(displayText, "%.0f", 100 * accumul_charge);
+		BSP_LCD_SetTextColor(primary_text_color);
+		BSP_LCD_SetFont(&Font_RobotoBlack36);
+		BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+		BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) - 21, displayText, CENTER_MODE);
+
+		drawn_accumul_charge = accumul_charge;
 	}
-
-	// Draw inner fill
-	BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-	BSP_LCD_FillRect(screen_margin + 2, yPos + 2, accumul_charge, barHeight - 4);
-
-	// Draw percentage text
-	uint8_t displayText[5];
-	sprintf(displayText, "%.0f", accumul_charge);
-
-	BSP_LCD_SetTextColor(primary_text_color);
-	BSP_LCD_SetFont(&Font_RobotoBlack36);
-	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-	BSP_LCD_DisplayStringAt(0, yPos + (barHeight / 2) - 21, displayText, CENTER_MODE);
 }
 
 void drawReading(uint16_t y, uint8_t* label, uint8_t* value, bool draw_borders) {
@@ -519,7 +576,7 @@ void drawMenuItemWithValue(uint16_t y, uint8_t* label, uint8_t value, bool draw_
 
     // Draw value text
 	uint8_t displayValue[5];
-	sprintf(displayValue, "%.0f", value);
+	sprintf(displayValue, "%d", value);
     BSP_LCD_SetFont(&Font_RobotoBlack26);
     BSP_LCD_DisplayStringAt(screen_width / 2 - 28, y + ((menu_line_height / 2) - 13), displayValue, CENTER_MODE);
 }
@@ -529,12 +586,14 @@ void updateMenuItemWithValue(uint16_t y, uint8_t* label, uint8_t value, bool sel
     else BSP_LCD_SetTextColor(primary_text_color);
 
     // Draw label text
-    BSP_LCD_SetFont(&Font_RobotoBlack26);
+    BSP_LCD_SetFont(&Font_RobotoMedium26);
     BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
     BSP_LCD_DisplayStringAt(15, y + ((menu_line_height / 2) - 12), label, LEFT_MODE);
 
     // Draw value text
-    BSP_LCD_DisplayStringAt(screen_width / 2 - 28, y + ((menu_line_height / 2) - 13), value, CENTER_MODE);
+    uint8_t display_value[5];
+    sprintf(display_value, "%d", value);
+    BSP_LCD_DisplayStringAt(screen_width / 2 - 28, y + ((menu_line_height / 2) - 13), display_value, CENTER_MODE);
 }
 
 void drawWarning() {

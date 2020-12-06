@@ -9,8 +9,8 @@ extern Driver_Profile current_driver;
 extern Event_Profile current_event;
 
 Driver_Profile drivers[4] = {
-    { "Default", 45.8, 3, 100, 76 },
-    { "James", 45.8, 3, 100, 76 },
+    { "Default", 45, 3, 100, 76 },
+    { "James", 45, 3, 100, 76 },
     { "Elon Musk", 20, 10, 10, 10 },
     { "Issac Baldry", 14, 2, 55, 100 },
 };

@@ -52,22 +52,26 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-Drive_Mode current_drive_mode = STATIC_MODE;
-Event_Profile current_event;
+
 uint8_t selected_menu_option;
 uint8_t max_menu_option;
-UI_Screen current_screen = SM_SCREEN;
-float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp =
-		20, motor_temp = 49, accumul_charge = 190, accumul_delta = -0.85;
-uint8_t total_laps = 0, current_lap = 1;
+UI_Screen current_screen = CAR_CONFIGURATION_SCREEN;
+float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp = 20,
+	  motor_temp = 49, accumul_charge = 0, accumul_delta = 1;
+uint8_t total_laps, current_lap;
+Drive_Mode current_drive_mode = STATIC_MODE;
 extern Driver_Profile drivers[4];
-Driver_Profile current_driver = { "Default", 45.8, 3, 100, 76 };
+Driver_Profile current_driver;
 extern Event_Profile events[4];
+Event_Profile current_event;
+
+// Input Controls
 volatile bool activate_btn_pressed = false;
 volatile uint8_t active_btn_state = 0;
 volatile bool back_btn_pressed = false;
 volatile uint8_t back_btn_state = 0;
 uint16_t raw;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -155,93 +159,131 @@ int main(void)
 
 	// Show first screen
 	drawScreen(current_screen);
-	selected_menu_option = 1;
-	current_driver = drivers[0];
+  while (1)
+  {
+	/* USER CODE END WHILE */
 
-	while (1) {
-    /* USER CODE END WHILE */
+	/* USER CODE BEGIN 3 */
+
+	// TODO Update state off CAN messages
+
+	// Get ADC value
+	//HAL_ADC_Start(&hadc1);
+	//HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	//raw = HAL_ADC_GetValue(&hadc1);
+
+	  if(!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5))
+	  {
+		  activate_btn_pressed = true;
+	  }
+
+	  if(!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4))
+	  {
+		  back_btn_pressed = true;
+	  }
+
+	accumul_delta -= 0.05f;
+
+	// Update screen
+	if (current_screen == RTD_SCREEN) {
 		// Update screen
-			    if (current_screen == RTD_SCREEN) {
-			    	// Update screen
-			    	updateRTDScreen();
-			    }
-			    else if (current_screen == SM_SCREEN) {
-			        // Update screen
-			    	updateSMScreen();
-
-			        // Handle navigation
-			        updateMenuScroll();
-
-			        // Handle activate of settings
-			        if (activate_btn_pressed) {
-			            switch (selected_menu_option) {
-			            case 0:
-			                drawScreen(DRIVER_SELECTION_SCREEN);
-			                break;
-			            case 1:
-			                drawScreen(EVENT_SELECTION_SCREEN);
-			                break;
-			            case 2:
-			                drawScreen(CAR_CONFIGURATION_SCREEN);
-			                break;
-			            case 3:
-			                //drawAdvancedScreen();
-			                break;
-			            }
-			        }
-			    }
-			    else if (current_screen == DRIVER_SELECTION_SCREEN) {
-			    	// Update screen
-			    	updateDriverSelectionScreen();
-
-			    	// Handle navigation
-			    	updateMenuScroll();
-
-			        // Handle activate of settings
-			        if (activate_btn_pressed) {
-			            changeDriver(drivers[selected_menu_option]);
-			        }
-
-			        if (back_btn_pressed) {
-			            drawScreen(SM_SCREEN);
-			        }
-			    }
-			    else if (current_screen == EVENT_SELECTION_SCREEN) {
-			    	// Update screen
-			        updateEventSelectionScreen();
-
-			        // Handle navigation
-			        updateMenuScroll();
-
-			        // Handle activate of settings
-			        if (activate_btn_pressed) {
-			            changeEvent(events[selected_menu_option]);
-			        }
-
-			        if (back_btn_pressed) {
-			            drawScreen(SM_SCREEN);
-			        }
-			    }
-			    else if (current_screen == CAR_CONFIGURATION_SCREEN) {
-			    	// Update screen
-			    	//updateCarConfigurationScreen();
-
-			        // Handle navigation
-			        updateMenuScroll();
-
-			        // Handle activate/value change of settings
-
-
-			        if (back_btn_pressed) {
-			            drawScreen(SM_SCREEN);
-			        }
-			    }
-
-			    // Handle back button
-
-			    HAL_Delay(400);
-    /* USER CODE BEGIN 3 */
+		updateRTDScreen();
 	}
+	else if (current_screen == SM_SCREEN) {
+		// Update screen
+		//updateSMScreen();
+
+		// Handle navigation
+		updateMenuScroll();
+
+		// Handle activate of settings
+		if (activate_btn_pressed) {
+			switch (selected_menu_option) {
+			case 0:
+				drawScreen(DRIVER_SELECTION_SCREEN);
+				break;
+			case 1:
+				drawScreen(EVENT_SELECTION_SCREEN);
+				break;
+			case 2:
+				drawScreen(CAR_CONFIGURATION_SCREEN);
+				break;
+			case 3:
+				//drawAdvancedScreen();
+				break;
+			}
+			activate_btn_pressed = false;
+		}
+	}
+	else if (current_screen == DRIVER_SELECTION_SCREEN) {
+		// Update screen
+		updateDriverSelectionScreen();
+
+		// Handle navigation
+		updateMenuScroll();
+
+		// Handle activate of settings
+		if (activate_btn_pressed) {
+			changeDriver(drivers[selected_menu_option]);
+		}
+
+		if (back_btn_pressed) {
+			drawScreen(SM_SCREEN);
+			back_btn_pressed = false;
+		}
+	}
+	else if (current_screen == EVENT_SELECTION_SCREEN) {
+		// Update screen
+		updateEventSelectionScreen();
+
+		// Handle navigation
+		updateMenuScroll();
+
+		// Handle activate of settings
+		if (activate_btn_pressed) {
+			changeEvent(events[selected_menu_option]);
+			activate_btn_pressed = false;
+		}
+
+		if (back_btn_pressed) {
+			drawScreen(SM_SCREEN);
+			back_btn_pressed = false;
+		}
+	}
+	else if (current_screen == CAR_CONFIGURATION_SCREEN) {
+		// Update screen
+		updateCarConfigurationScreen();
+
+		// Handle navigation
+		updateMenuScroll();
+
+		// Handle activate/value change of settings
+//        if(pot_incremented){
+//        	update_car_configuration();
+//			activate_btn_pressed = false;
+//		}
+
+		if (back_btn_pressed) {
+			drawScreen(SM_SCREEN);
+			back_btn_pressed = false;
+		}
+
+	}
+
+	  /* Update can_log file */
+//      string can_log_buffer;
+//      while (HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0){
+//    	  CAN_MSG_Generic_t msg;
+//    	  HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &(msg.header), msg.data);
+//    	  can_log_buffer += /*msg.header + " " + */ msg.data + "\n";
+//      }
+//      update_sd_file("can_log.txt", can_log_buffer);
+
+	  // Handle back button
+
+	  HAL_Delay(200);
+
+  }
   /* USER CODE END 3 */
 }
 
