@@ -55,7 +55,7 @@
 
 uint8_t selected_menu_option;
 uint8_t max_menu_option;
-UI_Screen current_screen = CAR_CONFIGURATION_SCREEN;
+UI_Screen current_screen = SM_SCREEN;
 float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp = 20,
 	  motor_temp = 49, accumul_charge = 0, accumul_delta = 1;
 uint8_t total_laps, current_lap;
@@ -161,9 +161,9 @@ int main(void)
 	drawScreen(current_screen);
   while (1)
   {
-	/* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-	/* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 
 	// TODO Update state off CAN messages
 
@@ -172,12 +172,14 @@ int main(void)
 	//HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
 	//raw = HAL_ADC_GetValue(&hadc1);
 
-	  if(!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5))
+	  // Check if activate button was pressed
+	  if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))
 	  {
 		  activate_btn_pressed = true;
 	  }
 
-	  if(!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4))
+	  // Check if back button was pressed
+	  if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2))
 	  {
 		  back_btn_pressed = true;
 	  }
@@ -191,7 +193,7 @@ int main(void)
 	}
 	else if (current_screen == SM_SCREEN) {
 		// Update screen
-		//updateSMScreen();
+		updateSMScreen();
 
 		// Handle navigation
 		updateMenuScroll();

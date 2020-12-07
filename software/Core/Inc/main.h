@@ -58,6 +58,8 @@ bool rtd;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define SW_2_Pin GPIO_PIN_2
+#define SW_2_GPIO_Port GPIOA
 #define SW_1_Pin GPIO_PIN_3
 #define SW_1_GPIO_Port GPIOA
 #define LED_B_Pin GPIO_PIN_4
