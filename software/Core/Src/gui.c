@@ -3,6 +3,7 @@
  *  Created on: 12 Nov 2020
  *  Author: James Hoskin
  */
+#include "gpio.h"
 #include "gui.h"
 #include "stm32_adafruit_lcd.h"
 #include <stdint.h>
@@ -76,11 +77,16 @@ void drawScreen(UI_Screen ui_screen) {
     }
 }
 void updateMenuScroll() {
-	if (menu_pot_incremented && selected_menu_option < max_menu_option) {
-		selected_menu_option++;
-	}
-	else if (menu_pot_decremented && selected_menu_option > 0) {
-		selected_menu_option--;
+	// Don't scroll menu if rotary encoder is pressed
+	// TODO add rotation segments/thresholds for an increase in value.
+	if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)){
+		uint16_t rot_enc_value = TIM2->CNT;
+			if(rot_enc_value > selected_menu_option && selected_menu_option < max_menu_option){
+				selected_menu_option++;
+			}
+			else if (rot_enc_value < selected_menu_option && selected_menu_option > 0) {
+				selected_menu_option--;
+			}
 	}
 }
 

@@ -64,6 +64,8 @@ bool rtd;
 #define SW_1_GPIO_Port GPIOA
 #define LED_B_Pin GPIO_PIN_4
 #define LED_B_GPIO_Port GPIOF
+#define ROT_ENC_SW_Pin GPIO_PIN_8
+#define ROT_ENC_SW_GPIO_Port GPIOA
 #define SCREEN_CS_Pin GPIO_PIN_10
 #define SCREEN_CS_GPIO_Port GPIOC
 #define SCREEN_D_C_Pin GPIO_PIN_11

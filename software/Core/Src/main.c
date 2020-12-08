@@ -21,6 +21,7 @@
 #include "main.h"
 #include "can.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -56,8 +57,8 @@
 uint8_t selected_menu_option;
 uint8_t max_menu_option;
 UI_Screen current_screen = SM_SCREEN;
-float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp = 20,
-	  motor_temp = 49, accumul_charge = 0, accumul_delta = 1;
+float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp =
+		20, motor_temp = 49, accumul_charge = 0, accumul_delta = 1;
 uint8_t total_laps, current_lap;
 Drive_Mode current_drive_mode = STATIC_MODE;
 extern Driver_Profile drivers[4];
@@ -119,6 +120,7 @@ int main(void)
   MX_SPI1_Init();
   MX_SPI2_Init();
   MX_USART1_UART_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 	/** Create CAN Filter & Apply it to &CANBUS4, &CANBUS2 */
 	CAN_FilterTypeDef sFilterConfig;
@@ -159,133 +161,123 @@ int main(void)
 
 	// Show first screen
 	drawScreen(current_screen);
-  while (1)
-  {
+	while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-	// TODO Update state off CAN messages
+		// TODO Update state off CAN messages
 
-	// Get ADC value
-	//HAL_ADC_Start(&hadc1);
-	//HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	//raw = HAL_ADC_GetValue(&hadc1);
+		// Check if activate button was pressed
+		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) {
+			activate_btn_pressed = true;
+		}
 
-	  // Check if activate button was pressed
-	  if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3))
-	  {
-		  activate_btn_pressed = true;
-	  }
+		// Check if back button was pressed
+		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2)) {
+			back_btn_pressed = true;
+		}
 
-	  // Check if back button was pressed
-	  if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2))
-	  {
-		  back_btn_pressed = true;
-	  }
-
-	accumul_delta -= 0.05f;
-
-	// Update screen
-	if (current_screen == RTD_SCREEN) {
 		// Update screen
-		updateRTDScreen();
-	}
-	else if (current_screen == SM_SCREEN) {
-		// Update screen
-		updateSMScreen();
+		if (current_screen == RTD_SCREEN) {
+			// Update screen
+			updateRTDScreen();
+		} else if (current_screen == SM_SCREEN) {
+			// Handle navigation
+			updateMenuScroll();
 
-		// Handle navigation
-		updateMenuScroll();
+			// Update screen
+			updateSMScreen();
 
-		// Handle activate of settings
-		if (activate_btn_pressed) {
-			switch (selected_menu_option) {
-			case 0:
-				drawScreen(DRIVER_SELECTION_SCREEN);
-				break;
-			case 1:
-				drawScreen(EVENT_SELECTION_SCREEN);
-				break;
-			case 2:
-				drawScreen(CAR_CONFIGURATION_SCREEN);
-				break;
-			case 3:
-				//drawAdvancedScreen();
-				break;
+			// Handle activate of settings
+			if (activate_btn_pressed) {
+				switch (selected_menu_option) {
+				case 0:
+					drawScreen(DRIVER_SELECTION_SCREEN);
+					break;
+				case 1:
+					drawScreen(EVENT_SELECTION_SCREEN);
+					break;
+				case 2:
+					drawScreen(CAR_CONFIGURATION_SCREEN);
+					break;
+				case 3:
+					//drawScreen(ADVANCED_SCREEN);
+					break;
+				}
+				activate_btn_pressed = false;
 			}
-			activate_btn_pressed = false;
+		} else if (current_screen == DRIVER_SELECTION_SCREEN) {
+			// Handle navigation
+			updateMenuScroll();
+
+			// Update screen
+			updateDriverSelectionScreen();
+
+			// Handle activate of settings
+			if (activate_btn_pressed) {
+				changeDriver(drivers[selected_menu_option]);
+			}
+
+			if (back_btn_pressed) {
+				drawScreen(SM_SCREEN);
+				back_btn_pressed = false;
+			}
+		} else if (current_screen == EVENT_SELECTION_SCREEN) {
+			// Handle navigation
+			updateMenuScroll();
+
+			// Update screen
+			updateEventSelectionScreen();
+
+			// Handle activate of settings
+			if (activate_btn_pressed) {
+				changeEvent(events[selected_menu_option]);
+				activate_btn_pressed = false;
+			}
+
+			if (back_btn_pressed) {
+				drawScreen(SM_SCREEN);
+				back_btn_pressed = false;
+			}
+		} else if (current_screen == CAR_CONFIGURATION_SCREEN) {
+			// Handle navigation
+			updateMenuScroll();
+
+			// Update screen
+			updateCarConfigurationScreen();
+
+			// Handle activate/value change of settings
+			// Edit selected settings if rotary encoder button is pressed down
+			if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
+				uint16_t rot_enc_value = TIM2->CNT;
+
+				// TODO implement setting value change
+
+				switch(selected_menu_option){
+				case 1:
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				case 4:
+					break;
+				default:
+					break;
+				}
+			}
+
+			if (back_btn_pressed) {
+				drawScreen(SM_SCREEN);
+				back_btn_pressed = false;
+			}
+
 		}
+
+		HAL_Delay(200);
+
 	}
-	else if (current_screen == DRIVER_SELECTION_SCREEN) {
-		// Update screen
-		updateDriverSelectionScreen();
-
-		// Handle navigation
-		updateMenuScroll();
-
-		// Handle activate of settings
-		if (activate_btn_pressed) {
-			changeDriver(drivers[selected_menu_option]);
-		}
-
-		if (back_btn_pressed) {
-			drawScreen(SM_SCREEN);
-			back_btn_pressed = false;
-		}
-	}
-	else if (current_screen == EVENT_SELECTION_SCREEN) {
-		// Update screen
-		updateEventSelectionScreen();
-
-		// Handle navigation
-		updateMenuScroll();
-
-		// Handle activate of settings
-		if (activate_btn_pressed) {
-			changeEvent(events[selected_menu_option]);
-			activate_btn_pressed = false;
-		}
-
-		if (back_btn_pressed) {
-			drawScreen(SM_SCREEN);
-			back_btn_pressed = false;
-		}
-	}
-	else if (current_screen == CAR_CONFIGURATION_SCREEN) {
-		// Update screen
-		updateCarConfigurationScreen();
-
-		// Handle navigation
-		updateMenuScroll();
-
-		// Handle activate/value change of settings
-//        if(pot_incremented){
-//        	update_car_configuration();
-//			activate_btn_pressed = false;
-//		}
-
-		if (back_btn_pressed) {
-			drawScreen(SM_SCREEN);
-			back_btn_pressed = false;
-		}
-
-	}
-
-	  /* Update can_log file */
-//      string can_log_buffer;
-//      while (HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0){
-//    	  CAN_MSG_Generic_t msg;
-//    	  HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &(msg.header), msg.data);
-//    	  can_log_buffer += /*msg.header + " " + */ msg.data + "\n";
-//      }
-//      update_sd_file("can_log.txt", can_log_buffer);
-
-	  // Handle back button
-
-	  HAL_Delay(200);
-
-  }
   /* USER CODE END 3 */
 }
 
@@ -307,7 +299,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL8;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -321,7 +313,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
