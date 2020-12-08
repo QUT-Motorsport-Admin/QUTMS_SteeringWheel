@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "QUTMS.h"
 
 
 extern Driver_Profile drivers[4];
@@ -92,9 +93,7 @@ void updateMenuScroll() {
 
 /* UI Pages */
 void drawStartupScreen() {
-    BSP_LCD_SetTextColor(primary_back_color);
-    BSP_LCD_SetFont(&Font_RobotoMedium24);
-    BSP_LCD_DisplayStringAt(screen_margin - 10, 24 + ((31 / 2) - 12), "START SCREEN", CENTER_MODE);
+	BSP_LCD_DrawRGB16Image(0, 120, QUTMS.width, QUTMS.height, (uint16_t*) QUTMS.pixel_data);
 }
 
 void drawRTDScreen() {
