@@ -33,6 +33,7 @@
 #include "QUTMS.h"
 #include "stdbool.h"
 #include "gui.h"
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -54,23 +55,27 @@
 
 /* USER CODE BEGIN PV */
 
-uint8_t selected_menu_option;
-uint8_t max_menu_option;
-UI_Screen current_screen = SM_SCREEN;
-float accumul_volts = 20, accumul_temp = 40, gearbox_temp = 40, inverter_temp =
-		20, motor_temp = 49, accumul_charge = 0, accumul_delta = 1;
-uint8_t total_laps, current_lap;
+// Car configuration
 Drive_Mode current_drive_mode = STATIC_MODE;
-extern Driver_Profile drivers[4];
-Driver_Profile current_driver;
+extern Event_Profile current_event;
+uint8_t selected_menu_option, max_menu_option;
+UI_Screen current_screen = CAR_CONFIGURATION_SCREEN;
+float accumul_volts = 50.0f, accumul_temp = 40.0f, gearbox_temp = 1.0f,
+		inverter_temp = 20.0f, motor_temp = 49.0f, accumul_charge = 0.5f,
+		accumul_delta = 0.0f;
+float drawn_accumul_volts = 0.0f, drawn_accumul_temp = 0.0f,
+		drawn_gearbox_temp = 0.0f, drawn_inverter_temp = 0.0f,
+		drawn_motor_temp = 0.0f, drawn_accumul_charge = 0.0f,
+		drawn_accumul_delta = 0.0f;
+uint8_t total_laps = 0, current_lap = 1;
+extern Driver_Profile drivers[4], current_driver;
 extern Event_Profile events[4];
-Event_Profile current_event;
 
-// Input Controls
-volatile bool activate_btn_pressed = false;
-volatile uint8_t active_btn_state = 0;
-volatile bool back_btn_pressed = false;
-volatile uint8_t back_btn_state = 0;
+// Inputs
+volatile bool activate_btn_pressed, back_btn_pressed;
+volatile uint8_t active_btn_state = 0, back_btn_state = 0;
+extern bool menu_pot_incremented, menu_pot_decremented, menu_pot_pressed;
+uint8_t prev_pot_value, current_pot_value;
 uint16_t raw;
 
 /* USER CODE END PV */
@@ -149,12 +154,13 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	BSP_LCD_Init();
-	BSP_LCD_Clear(LCD_COLOR_WHITE);
+	BSP_LCD_Clear(LCD_COLOR_BLACK);
 
 	drawStartupScreen();
 	HAL_Delay(2000);
 
 	// Show first screen
+	current_driver = drivers[2];
 	drawScreen(current_screen);
 	while (1) {
 		/* USER CODE END WHILE */
@@ -162,6 +168,10 @@ int main(void) {
 		/* USER CODE BEGIN 3 */
 
 		// TODO Update state off CAN messages
+		// Get ADC value
+		//HAL_ADC_Start(&hadc1);
+		//HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		//raw = HAL_ADC_GetValue(&hadc1);
 		// Check if activate button was pressed
 		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) {
 			activate_btn_pressed = true;
@@ -172,18 +182,25 @@ int main(void) {
 			back_btn_pressed = true;
 		}
 
+		// Check if menu pot changed
+		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) {
+			menu_pot_pressed = true;
+		}
+
+		current_pot_value = ((TIM2->CNT) >> 2); // right-shifting the counter value by 2 in order to print 1 tick for each actual tick on the encoder
+		if (current_pot_value < prev_pot_value) {
+			menu_pot_decremented = true;
+		} else if (current_pot_value > prev_pot_value) {
+			menu_pot_incremented = true;
+		}
+		prev_pot_value = current_pot_value;
+
 		// Update screen
 		if (current_screen == RTD_SCREEN) {
-			// Update screen
 			updateRTDScreen();
 		} else if (current_screen == SM_SCREEN) {
-			// Handle navigation
-			updateMenuScroll();
-
-			// Update screen
 			updateSMScreen();
 
-			// Handle activate of settings
 			if (activate_btn_pressed) {
 				switch (selected_menu_option) {
 				case 0:
@@ -195,82 +212,48 @@ int main(void) {
 				case 2:
 					drawScreen(CAR_CONFIGURATION_SCREEN);
 					break;
-				case 3:
-					//drawScreen(ADVANCED_SCREEN);
-					break;
 				}
-				activate_btn_pressed = false;
 			}
 		} else if (current_screen == DRIVER_SELECTION_SCREEN) {
-			// Handle navigation
-			updateMenuScroll();
-
-			// Update screen
 			updateDriverSelectionScreen();
 
-			// Handle activate of settings
 			if (activate_btn_pressed) {
 				changeDriver(drivers[selected_menu_option]);
 			}
 
 			if (back_btn_pressed) {
 				drawScreen(SM_SCREEN);
-				back_btn_pressed = false;
 			}
 		} else if (current_screen == EVENT_SELECTION_SCREEN) {
-			// Handle navigation
-			updateMenuScroll();
-
-			// Update screen
 			updateEventSelectionScreen();
 
-			// Handle activate of settings
 			if (activate_btn_pressed) {
 				changeEvent(events[selected_menu_option]);
-				activate_btn_pressed = false;
 			}
 
 			if (back_btn_pressed) {
 				drawScreen(SM_SCREEN);
-				back_btn_pressed = false;
 			}
 		} else if (current_screen == CAR_CONFIGURATION_SCREEN) {
-			// Handle navigation
-			updateMenuScroll();
-
-			// Update screen
 			updateCarConfigurationScreen();
 
 			// Handle activate/value change of settings
-			// Edit selected settings if rotary encoder button is pressed down
-			if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
-				uint16_t rot_enc_value = TIM2->CNT;
-
-				// TODO implement setting value change
-
-				switch (selected_menu_option) {
-				case 1:
-					break;
-				case 2:
-					break;
-				case 3:
-					break;
-				case 4:
-					break;
-				default:
-					break;
-				}
+			if (menu_pot_pressed) {
+				updateCarConfiguration();
 			}
 
 			if (back_btn_pressed) {
 				drawScreen(SM_SCREEN);
-				back_btn_pressed = false;
 			}
-
 		}
 
-		HAL_Delay(200);
+		// Reset inputs
+		back_btn_pressed = false;
+		activate_btn_pressed = false;
+		menu_pot_pressed = false;
 
+		// Refresh Delay
+		HAL_Delay(100);
 	}
 	/* USER CODE END 3 */
 }
