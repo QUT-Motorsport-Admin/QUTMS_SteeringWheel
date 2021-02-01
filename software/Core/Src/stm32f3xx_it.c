@@ -42,7 +42,9 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+uint8_t prev_inc_state = 0;
+uint8_t inc_state = 0;
+volatile int curr_value = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -196,6 +198,29 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f3xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles EXTI line1 interrupt.
+  */
+void EXTI1_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI1_IRQn 0 */
+	inc_state = HAL_GPIO_ReadPin(ROT1_ENC_INC_GPIO_Port, ROT1_ENC_INC_Pin);
+
+	//if (inc_state != prev_inc_state) {
+		if (inc_state != HAL_GPIO_ReadPin(ROT1_ENC_DEC_GPIO_Port, ROT1_ENC_DEC_Pin)) {
+			curr_value++;
+		} else {
+			curr_value--;
+		}
+	//}
+	prev_inc_state = inc_state;
+  /* USER CODE END EXTI1_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+  /* USER CODE BEGIN EXTI1_IRQn 1 */
+
+  /* USER CODE END EXTI1_IRQn 1 */
+}
 
 /**
   * @brief This function handles USB low priority or CAN_RX0 interrupts.

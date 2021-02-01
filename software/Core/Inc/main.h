@@ -55,17 +55,24 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 bool rtd;
+extern volatile int curr_value;
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define SW_2_Pin GPIO_PIN_2
-#define SW_2_GPIO_Port GPIOA
-#define SW_1_Pin GPIO_PIN_3
-#define SW_1_GPIO_Port GPIOA
+#define BACK_SW_Pin GPIO_PIN_2
+#define BACK_SW_GPIO_Port GPIOA
+#define ACTIVATE_SW_Pin GPIO_PIN_3
+#define ACTIVATE_SW_GPIO_Port GPIOA
 #define LED_B_Pin GPIO_PIN_4
 #define LED_B_GPIO_Port GPIOF
-#define ROT_ENC_SW_Pin GPIO_PIN_8
-#define ROT_ENC_SW_GPIO_Port GPIOA
+#define ROT1_ENC_DEC_Pin GPIO_PIN_0
+#define ROT1_ENC_DEC_GPIO_Port GPIOB
+#define ROT1_ENC_INC_Pin GPIO_PIN_1
+#define ROT1_ENC_INC_GPIO_Port GPIOB
+#define ROT1_ENC_INC_EXTI_IRQn EXTI1_IRQn
+#define ROT1_ENC_SW_Pin GPIO_PIN_8
+#define ROT1_ENC_SW_GPIO_Port GPIOA
 #define SCREEN_CS_Pin GPIO_PIN_10
 #define SCREEN_CS_GPIO_Port GPIOC
 #define SCREEN_D_C_Pin GPIO_PIN_11

@@ -21,7 +21,6 @@
 #include "main.h"
 #include "can.h"
 #include "spi.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -54,12 +53,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
 // Car configuration
 Drive_Mode current_drive_mode = STATIC_MODE;
 extern Event_Profile current_event;
 uint8_t selected_menu_option, max_menu_option;
-UI_Screen current_screen = CAR_CONFIGURATION_SCREEN;
+UI_Screen current_screen = SM_SCREEN;
 float accumul_volts = 50.0f, accumul_temp = 40.0f, gearbox_temp = 1.0f,
 		inverter_temp = 20.0f, motor_temp = 49.0f, accumul_charge = 0.5f,
 		accumul_delta = 0.0f;
@@ -82,6 +80,7 @@ uint16_t raw;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -91,37 +90,40 @@ void SystemClock_Config(void);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
-int main(void) {
-	/* USER CODE BEGIN 1 */
-	/* USER CODE END 1 */
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+  /* USER CODE END 1 */
 
-	/* MCU Configuration--------------------------------------------------------*/
+  /* MCU Configuration--------------------------------------------------------*/
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-	/* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 
-	/* USER CODE END Init */
+  /* USER CODE END Init */
 
-	/* Configure the system clock */
-	SystemClock_Config();
+  /* Configure the system clock */
+  SystemClock_Config();
 
-	/* USER CODE BEGIN SysInit */
+  /* USER CODE BEGIN SysInit */
 
-	/* USER CODE END SysInit */
+  /* USER CODE END SysInit */
 
-	/* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_CAN_Init();
-	MX_SPI1_Init();
-	MX_SPI2_Init();
-	MX_USART1_UART_Init();
-	MX_TIM2_Init();
-	/* USER CODE BEGIN 2 */
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_CAN_Init();
+  MX_SPI1_Init();
+  MX_SPI2_Init();
+  MX_USART1_UART_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
+  /* USER CODE BEGIN 2 */
 	/** Create CAN Filter & Apply it to &CANBUS4, &CANBUS2 */
 	CAN_FilterTypeDef sFilterConfig;
 
@@ -149,23 +151,23 @@ int main(void) {
 		Error_Handler();
 	}
 
-	/* USER CODE END 2 */
+  /* USER CODE END 2 */
 
-	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 	BSP_LCD_Init();
-	BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-	drawStartupScreen();
-	HAL_Delay(2000);
+//	drawStartupScreen();
+//	HAL_Delay(2000);
+
 
 	// Show first screen
 	current_driver = drivers[2];
 	drawScreen(current_screen);
 	while (1) {
-		/* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-		/* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 
 		// TODO Update state off CAN messages
 		// Get ADC value
@@ -183,23 +185,23 @@ int main(void) {
 		}
 
 		// Check if menu pot changed
-		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) {
+		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
 			menu_pot_pressed = true;
 		}
 
-		current_pot_value = ((TIM2->CNT) >> 2); // right-shifting the counter value by 2 in order to print 1 tick for each actual tick on the encoder
-		if (current_pot_value < prev_pot_value) {
-			menu_pot_decremented = true;
-		} else if (current_pot_value > prev_pot_value) {
-			menu_pot_incremented = true;
-		}
-		prev_pot_value = current_pot_value;
+
 
 		// Update screen
 		if (current_screen == RTD_SCREEN) {
 			updateRTDScreen();
 		} else if (current_screen == SM_SCREEN) {
 			updateSMScreen();
+
+			if(menu_pot_incremented || menu_pot_pressed){
+				BSP_LCD_SetBackColor(LCD_COLOR_GREEN);
+				BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+				BSP_LCD_FillRect(0, 0, 100, 100);
+			}
 
 			if (activate_btn_pressed) {
 				switch (selected_menu_option) {
@@ -255,62 +257,94 @@ int main(void) {
 		// Refresh Delay
 		HAL_Delay(100);
 	}
-	/* USER CODE END 3 */
+  /* USER CODE END 3 */
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
-void SystemClock_Config(void) {
-	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
-	RCC_PeriphCLKInitTypeDef PeriphClkInit = { 0 };
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-	/** Initializes the RCC Oscillators according to the specified parameters
-	 * in the RCC_OscInitTypeDef structure.
-	 */
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
-	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-		Error_Handler();
-	}
-	/** Initializes the CPU, AHB and APB buses clocks
-	 */
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL8;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
-		Error_Handler();
-	}
-	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
-	PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
-	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
-		Error_Handler();
-	}
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
+  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* EXTI1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	// When pulse A goes low, is pulse b low or high, if its high, then its a clockwise movement otherwise it is anti clockwise
+
+
+//	if(GPIO_Pin == 1){
+//		BSP_LCD_SetBackColor(LCD_COLOR_RED);
+//		BSP_LCD_SetTextColor(LCD_COLOR_RED);
+//		BSP_LCD_FillRect(0, 0, 100, 100);
+//	}
+//	else if(GPIO_Pin == 2){
+//		BSP_LCD_SetBackColor(LCD_COLOR_GREEN);
+//		BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+//		BSP_LCD_FillRect(0, 0, 100, 100);
+//	}
+}
+
 
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void) {
-	/* USER CODE BEGIN Error_Handler_Debug */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 
-	/* USER CODE END Error_Handler_Debug */
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
