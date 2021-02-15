@@ -225,48 +225,48 @@ void EXTI1_IRQHandler(void)
 /**
   * @brief This function handles USB low priority or CAN_RX0 interrupts.
   */
-void USB_LP_CAN_RX0_IRQHandler(void)
-{
-  /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 0 */
-	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0)
-	{
-		CAN_RxHeaderTypeDef header;
-		uint8_t data[8];
-		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0,  &header, data) != HAL_OK);
-		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
-		{
-			rtd = true;
-		}
-	}
-  /* USER CODE END USB_LP_CAN_RX0_IRQn 0 */
-  HAL_CAN_IRQHandler(&hcan);
-  /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 1 */
+// void USB_LP_CAN_RX0_IRQHandler(void)
+// {
+//   /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 0 */
+// 	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0)
+// 	{
+// 		CAN_RxHeaderTypeDef header;
+// 		uint8_t data[8];
+// 		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0,  &header, data) != HAL_OK);
+// 		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
+// 		{
+// 			rtd = true;
+// 		}
+// 	}
+//   /* USER CODE END USB_LP_CAN_RX0_IRQn 0 */
+//   HAL_CAN_IRQHandler(&hcan);
+//   /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 1 */
 
-  /* USER CODE END USB_LP_CAN_RX0_IRQn 1 */
-}
+//   /* USER CODE END USB_LP_CAN_RX0_IRQn 1 */
+// }
 
-/**
-  * @brief This function handles CAN RX1 interrupt.
-  */
-void CAN_RX1_IRQHandler(void)
-{
-  /* USER CODE BEGIN CAN_RX1_IRQn 0 */
-	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO1) > 0)
-	{
-		CAN_RxHeaderTypeDef header;
-		uint8_t data[8];
-		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO1,  &header, data) != HAL_OK);
-		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
-		{
-			rtd = true;
-		}
-	}
-  /* USER CODE END CAN_RX1_IRQn 0 */
-  HAL_CAN_IRQHandler(&hcan);
-  /* USER CODE BEGIN CAN_RX1_IRQn 1 */
+// /**
+//   * @brief This function handles CAN RX1 interrupt.
+//   */
+// void CAN_RX1_IRQHandler(void)
+// {
+//   /* USER CODE BEGIN CAN_RX1_IRQn 0 */
+// 	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO1) > 0)
+// 	{
+// 		CAN_RxHeaderTypeDef header;
+// 		uint8_t data[8];
+// 		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO1,  &header, data) != HAL_OK);
+// 		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
+// 		{
+// 			rtd = true;
+// 		}
+// 	}
+//   /* USER CODE END CAN_RX1_IRQn 0 */
+//   HAL_CAN_IRQHandler(&hcan);
+//   /* USER CODE BEGIN CAN_RX1_IRQn 1 */
 
-  /* USER CODE END CAN_RX1_IRQn 1 */
-}
+//   /* USER CODE END CAN_RX1_IRQn 1 */
+// }
 
 /* USER CODE BEGIN 1 */
 
