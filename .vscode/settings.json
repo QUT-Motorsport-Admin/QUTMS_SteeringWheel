@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "main.h": "c",
+        "qutms_can.h": "c"
+    }
+}
