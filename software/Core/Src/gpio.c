@@ -51,7 +51,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|SCREEN_CS_Pin
+  HAL_GPIO_WritePin(GPIOC, SCREEN_RS_Pin|SCREEN_TE_Pin|SCREEN_BL_Pin|SCREEN_CS_Pin
                           |SCREEN_D_C_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -60,9 +60,9 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_A_GPIO_Port, LED_A_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PC0 PC1 PC2 PCPin
+  /*Configure GPIO pins : PCPin PCPin PCPin PCPin
                            PCPin */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|SCREEN_CS_Pin
+  GPIO_InitStruct.Pin = SCREEN_RS_Pin|SCREEN_TE_Pin|SCREEN_BL_Pin|SCREEN_CS_Pin
                           |SCREEN_D_C_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

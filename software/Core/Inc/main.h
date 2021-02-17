@@ -60,6 +60,12 @@ extern volatile int curr_value;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define SCREEN_RS_Pin GPIO_PIN_0
+#define SCREEN_RS_GPIO_Port GPIOC
+#define SCREEN_TE_Pin GPIO_PIN_1
+#define SCREEN_TE_GPIO_Port GPIOC
+#define SCREEN_BL_Pin GPIO_PIN_2
+#define SCREEN_BL_GPIO_Port GPIOC
 #define BACK_SW_Pin GPIO_PIN_2
 #define BACK_SW_GPIO_Port GPIOA
 #define ACTIVATE_SW_Pin GPIO_PIN_3
