@@ -21,9 +21,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f3xx_it.h"
-#include "QUTMS_can.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "QUTMS_can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,6 +60,7 @@ volatile int curr_value = 0;
 
 /* External variables --------------------------------------------------------*/
 extern CAN_HandleTypeDef hcan;
+extern DMA_HandleTypeDef hdma_spi1_tx;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -224,21 +225,26 @@ void EXTI1_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA1 channel3 global interrupt.
+  */
+void DMA1_Channel3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_spi1_tx);
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 1 */
+}
+
+/**
   * @brief This function handles USB low priority or CAN_RX0 interrupts.
   */
 void USB_LP_CAN_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 0 */
-	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0)
-	{
-		CAN_RxHeaderTypeDef header;
-		uint8_t data[8];
-		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0,  &header, data) != HAL_OK);
-		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
-		{
-			rtd = true;
-		}
-	}
+
   /* USER CODE END USB_LP_CAN_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
   /* USER CODE BEGIN USB_LP_CAN_RX0_IRQn 1 */
@@ -252,16 +258,7 @@ void USB_LP_CAN_RX0_IRQHandler(void)
 void CAN_RX1_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN_RX1_IRQn 0 */
-	while(HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO1) > 0)
-	{
-		CAN_RxHeaderTypeDef header;
-		uint8_t data[8];
-		if(HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO1,  &header, data) != HAL_OK);
-		if(header.ExtId == Compose_CANId(0x2, 0x16, 0x0, 0x0, 0x0, 0x0))
-		{
-			rtd = true;
-		}
-	}
+
   /* USER CODE END CAN_RX1_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
   /* USER CODE BEGIN CAN_RX1_IRQn 1 */
