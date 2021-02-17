@@ -33,6 +33,7 @@
 #include "stdbool.h"
 #include "gui.h"
 #include <string.h>
+#include "../lvgl/lvgl.h"
 
 /* USER CODE END Includes */
 
@@ -82,6 +83,7 @@ uint16_t raw;
 void SystemClock_Config(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
+void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
 /* USER CODE END PFP */
 
@@ -99,11 +101,15 @@ int main(void)
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
+  
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+
+  /* Initialise graphics library----------------------------------------------*/
+  lv_init();
 
   /* USER CODE END Init */
 
@@ -155,110 +161,150 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	BSP_LCD_Init();
+	
 
 //	drawStartupScreen();
 //	HAL_Delay(2000);
 
+	/*******************************
+     *    DISPLAY DRIVERS DEMO     *
+     ******************************/ 
 
-	// Show first screen
-	current_driver = drivers[2];
-	drawScreen(current_screen);
+    /*A static or global variable to store the buffers*/
+    static lv_disp_buf_t disp_buf;
+
+    /*Static or global buffer(s). The second buffer is optional*/
+    static lv_color_t buf_1[320 * 10];
+    //static lv_color_t buf_2[320];
+
+    /*Initialize `disp_buf` with the buffer(s) */
+    lv_disp_buf_init(&disp_buf, buf_1, NULL, 320 * 5);
+
+
+    lv_disp_drv_t disp_drv;                 /*A variable to hold the drivers. Can be local variable*/
+    lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+    disp_drv.buffer = &disp_buf;            /*Set an initialized buffer*/
+    disp_drv.flush_cb = my_flush_cb;        /*Set a flush callback to draw to the display*/
+    lv_disp_t * disp;
+    disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
+
+	screen_create();
+
 	while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    lv_task_handler();
+	
+		// // TODO Update state off CAN messages
+		// // Get ADC value
+		// //HAL_ADC_Start(&hadc1);
+		// //HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		// //raw = HAL_ADC_GetValue(&hadc1);
+		// // Check if activate button was pressed
+		// if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) {
+		// 	activate_btn_pressed = true;
+		// }
 
-		// TODO Update state off CAN messages
-		// Get ADC value
-		//HAL_ADC_Start(&hadc1);
-		//HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-		//raw = HAL_ADC_GetValue(&hadc1);
-		// Check if activate button was pressed
-		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) {
-			activate_btn_pressed = true;
-		}
+		// // Check if back button was pressed
+		// if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2)) {
+		// 	back_btn_pressed = true;
+		// }
 
-		// Check if back button was pressed
-		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2)) {
-			back_btn_pressed = true;
-		}
-
-		// Check if menu pot changed
-		if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
-			menu_pot_pressed = true;
-		}
+		// // Check if menu pot changed
+		// if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
+		// 	menu_pot_pressed = true;
+		// }
 
 
 
-		// Update screen
-		if (current_screen == RTD_SCREEN) {
-			updateRTDScreen();
-		} else if (current_screen == SM_SCREEN) {
-			updateSMScreen();
+		// // Update screen
+		// if (current_screen == RTD_SCREEN) {
+		// 	updateRTDScreen();
+		// } else if (current_screen == SM_SCREEN) {
+		// 	updateSMScreen();
 
-			if(menu_pot_incremented || menu_pot_pressed){
-				BSP_LCD_SetBackColor(LCD_COLOR_GREEN);
-				BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-				BSP_LCD_FillRect(0, 0, 100, 100);
-			}
+		// 	if(menu_pot_incremented || menu_pot_pressed){
+		// 		BSP_LCD_SetBackColor(LCD_COLOR_GREEN);
+		// 		BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+		// 		BSP_LCD_FillRect(0, 0, 100, 100);
+		// 	}
 
-			if (activate_btn_pressed) {
-				switch (selected_menu_option) {
-				case 0:
-					drawScreen(DRIVER_SELECTION_SCREEN);
-					break;
-				case 1:
-					drawScreen(EVENT_SELECTION_SCREEN);
-					break;
-				case 2:
-					drawScreen(CAR_CONFIGURATION_SCREEN);
-					break;
-				}
-			}
-		} else if (current_screen == DRIVER_SELECTION_SCREEN) {
-			updateDriverSelectionScreen();
+		// 	if (activate_btn_pressed) {
+		// 		switch (selected_menu_option) {
+		// 		case 0:
+		// 			drawScreen(DRIVER_SELECTION_SCREEN);
+		// 			break;
+		// 		case 1:
+		// 			drawScreen(EVENT_SELECTION_SCREEN);
+		// 			break;
+		// 		case 2:
+		// 			drawScreen(CAR_CONFIGURATION_SCREEN);
+		// 			break;
+		// 		}
+		// 	}
+		// } else if (current_screen == DRIVER_SELECTION_SCREEN) {
+		// 	updateDriverSelectionScreen();
 
-			if (activate_btn_pressed) {
-				changeDriver(drivers[selected_menu_option]);
-			}
+		// 	if (activate_btn_pressed) {
+		// 		changeDriver(drivers[selected_menu_option]);
+		// 	}
 
-			if (back_btn_pressed) {
-				drawScreen(SM_SCREEN);
-			}
-		} else if (current_screen == EVENT_SELECTION_SCREEN) {
-			updateEventSelectionScreen();
+		// 	if (back_btn_pressed) {
+		// 		drawScreen(SM_SCREEN);
+		// 	}
+		// } else if (current_screen == EVENT_SELECTION_SCREEN) {
+		// 	updateEventSelectionScreen();
 
-			if (activate_btn_pressed) {
-				changeEvent(events[selected_menu_option]);
-			}
+		// 	if (activate_btn_pressed) {
+		// 		changeEvent(events[selected_menu_option]);
+		// 	}
 
-			if (back_btn_pressed) {
-				drawScreen(SM_SCREEN);
-			}
-		} else if (current_screen == CAR_CONFIGURATION_SCREEN) {
-			updateCarConfigurationScreen();
+		// 	if (back_btn_pressed) {
+		// 		drawScreen(SM_SCREEN);
+		// 	}
+		// } else if (current_screen == CAR_CONFIGURATION_SCREEN) {
+		// 	updateCarConfigurationScreen();
 
-			// Handle activate/value change of settings
-			if (menu_pot_pressed) {
-				updateCarConfiguration();
-			}
+		// 	// Handle activate/value change of settings
+		// 	if (menu_pot_pressed) {
+		// 		updateCarConfiguration();
+		// 	}
 
-			if (back_btn_pressed) {
-				drawScreen(SM_SCREEN);
-			}
-		}
+		// 	if (back_btn_pressed) {
+		// 		drawScreen(SM_SCREEN);
+		// 	}
+		// }
 
-		// Reset inputs
-		back_btn_pressed = false;
-		activate_btn_pressed = false;
-		menu_pot_pressed = false;
+		// // Reset inputs
+		// back_btn_pressed = false;
+		// activate_btn_pressed = false;
+		// menu_pot_pressed = false;
 
-		// Refresh Delay
-		HAL_Delay(100);
+		// // Refresh Delay
+		// HAL_Delay(100);
 	}
   /* USER CODE END 3 */
 }
+
+void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+{
+    /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
+    int32_t x, y;
+    for(y = area->y1; y <= area->y2; y++) {
+        for(x = area->x1; x <= area->x2; x++) {
+            ili9488_WritePixel(x, y, *color_p);
+            color_p++;
+        }
+    }
+
+    /* IMPORTANT!!!
+     * Inform the graphics library that you are ready with the flushing*/
+    lv_disp_flush_ready(disp_drv);
+}
+
+
+
 
 /**
   * @brief System Clock Configuration
