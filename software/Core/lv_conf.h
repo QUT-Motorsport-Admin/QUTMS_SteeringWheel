@@ -299,7 +299,7 @@ typedef void * lv_img_decoder_user_data_t;
  * It removes the need to manually update the tick with `lv_tick_inc`) */
 #define LV_TICK_CUSTOM     1
 #if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "/home/malex/QUTMS/QUTMS_SteeringWheel-QEV3/software/Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"         /*Header for the system time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "stm32f3xx_hal.h"         /*Header for the system time function*/
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR  (HAL_GetTick())    /*Expression evaluating to current system time in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 

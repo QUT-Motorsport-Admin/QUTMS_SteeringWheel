@@ -12,6 +12,7 @@
  *********************/
 #include <lvgl.h>
 #include <stdio.h>
+#include "screen.h"
 
 /*********************
  *      DEFINES
@@ -31,11 +32,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void RTD_open(void);
-static void event_select_open(void);
-static void driver_select_open(void);
-
-
 LV_EVENT_CB_DECLARE(page_open_cb);
 LV_EVENT_CB_DECLARE(RTD_Selected_cb);
 LV_EVENT_CB_DECLARE(driver_selected_cb);
@@ -171,7 +167,7 @@ void screen_create(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void RTD_open(void)
+void RTD_open(void)
 {
     lv_obj_del(btnMatrix);
     
@@ -229,7 +225,7 @@ static void RTD_open(void)
 
 }
 
-static void driver_select_open(void)
+void driver_select_open(void)
 {
     //Label
     lv_label_set_text(header_label, "Driver Selection");
@@ -245,7 +241,7 @@ static void driver_select_open(void)
     lv_obj_set_event_cb(btnMatrix, driver_selected_cb);
 }
 
-static void event_select_open(void)
+void event_select_open(void)
 {
     //Label
     lv_label_set_text(header_label, "Event Selection");
