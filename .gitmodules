@@ -1,3 +1,6 @@
 [submodule "software/Core/lvgl"]
 	path = software/Core/lvgl
 	url = https://github.com/lvgl/lvgl
+[submodule "software/Core/Common"]
+	path = software/Core/Common
+	url = https://github.com/QUT-Motorsport/QUTMS_Embedded_Common.git
