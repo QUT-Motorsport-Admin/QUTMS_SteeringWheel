@@ -53,3 +53,8 @@ dkms.conf
 
 # OS generated files
 .DS_Store
+hardware/__Previews/
+
+hardware/History/
+
+hardware/Project Logs for QUTMS-STRWHL-V00/
